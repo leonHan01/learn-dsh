@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "00-学习路径.md",
+                "file": "course/day-02.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "00-学习路径"
+              "title": "day-02"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "00-学习路径.md",
+                "file": "course/day-02.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "00-学习路径.md",
+                "file": "course/day-02.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "00-学习路径.md",
+                "file": "course/day-02.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -189,6 +189,9 @@
   },
   "active": "cc54eb93464bcc71",
   "lastOpenFiles": [
+    "course/day-01.md",
+    "00-学习路径.md",
+    "README.md",
     "course/day-11.md",
     "course/day-10.md",
     "course/day-12.md",
@@ -199,10 +202,7 @@
     "course/day-05.md",
     "course/day-04.md",
     "course/day-03.md",
-    "README.md",
-    "00-学习路径.md",
     "course/day-02.md",
-    "course/day-01.md",
     "course/README.md",
     "course"
   ]
