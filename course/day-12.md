@@ -145,6 +145,17 @@ ACP 是「协议驱动」范例：stdio 拥有 stdout，工厂创建/恢复 agen
 
 写 [`learn/12-工程与表面.md`](../12-工程与表面.md)。包含「下一步」清单，以及你读的那篇 postmortem 的四问答案。
 
+---
+
+### 参考答案
+
+1. 一次 prompt 只保证入队。整 agent 的状态另发通知。把 turn 结束绑在 prompt 方法上，会让 UI 和自动化无法中途 steer / cancel。
+2. 先改工具的 `presentCall` / `presentResult`。client 只映射 `card` 标签。新节点类型才走 ConversationNode cookbook。
+3. mock 和手写 ctx.plugin 走不到 Loader / 真实组装。keyless snapshot 用真实叶子和回放打这个洞。
+4. 证明 `src` 每行被执行过。不证明产品行为对、不证明组装后的 transcript 对。
+5. `docs/architecture.md` 的 turn 流程，以及任何因此过时的 lifecycle 图。
+6. 不能。archived 已冻结，不是现行权威。看 `implemented/` 和当前 README。
+
 ## 七、课程序列到此结束
 
 回头看 [`00-学习路径.md`](../00-学习路径.md) 里「先不要读什么」。那些推迟项现在可以按需解禁，但仍然不要线性翻 `packages/client`。

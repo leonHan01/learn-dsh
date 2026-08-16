@@ -125,6 +125,17 @@ context 插件写入的 runtime-context 会成为模型历史里带来源的快�
 
 写 [`learn/09-会话数据平面.md`](../09-会话数据平面.md)。画「磁盘 / 内存 / surface / 某次 request/header」四层，并标注 compaction 作用在哪一层。
 
+---
+
+### 参考答案
+
+1. JSONL：每会话一个 transcript 文件，`locate` 给路径。SQLite：多会话共享库。崩溃恢复：冷加载时若轮次未闭合，追加合成 `turn/end { interrupted }`，不截断。
+2. 否则磁盘上的日志重建不出这次模型请求。
+3. 改 surface（`replace`），原始事件还在。人类 transcript 读 append-origin 事件，不读当前（已被替换的）surface。
+4. 活着的 loop 要么正常 `turn/end`，要么还在跑。`interrupted` 只描述「进程死了、日志敞着」这种冷事实。
+5. append 是同步热路径。等盘会拖住模型流和工具。持久化异步批写，`flush` 才是检查点。
+6. 是。同一 `ctx.compaction`。差别只是触发点：`pre-step` / `request-error` / 手动。
+
 ## 七、明日预告
 
 四条「让 agent 继续干活」的机制：subagent、goal、Ralph、workflow。名字像，语义完全不是一回事。
