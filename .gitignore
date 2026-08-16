@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+!.env.example
+.credentials.yaml
+
+# OS & editors
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+*~
+
+# course leftovers if someone dumps config here
+dsh-web.yml
+dsh-headless.yml
+tmp/
+scratch-plugin/
