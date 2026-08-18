@@ -4,7 +4,7 @@
 **时长：** 4–5 小时
 **今天结束时你能：** 按要做的事选对表面入口；在改代码前知道会撞上哪些门禁。
 
-不要把 `packages/client` 当阅读材料从头翻。
+不要把 `packages/client` 当阅读材料从头翻。图：[architecture.md §23](./architecture.md#23-产品表面都是适配器)。跟读完整请求：[walkthrough.md](./walkthrough.md)。易错：[mistakes.md](./mistakes.md)。
 
 ## 时间表
 

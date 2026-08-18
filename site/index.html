@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>learn_dsh</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <a class="brand" href="#/home">learn_dsh</a>
+      <div class="brand-sub">DeepSeek Harness 课程</div>
+      <nav id="nav"></nav>
+    </aside>
+    <main>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="本页搜索…" autocomplete="off">
+        <div class="status" id="status"></div>
+      </div>
+      <article class="prose" id="prose">加载中…</article>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

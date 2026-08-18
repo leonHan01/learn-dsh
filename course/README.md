@@ -1,6 +1,8 @@
 # dsh 课程
 
-**课表真源。** 阶段全图见 [00-学习路径.md](../00-学习路径.md)。架构图见 [architecture.md](./architecture.md)。
+**课表真源。** 阶段全图见 [00-学习路径.md](../00-学习路径.md)。图集 [architecture.md](./architecture.md) · 跟读 [walkthrough.md](./walkthrough.md) · 速查 [cheatsheet.md](./cheatsheet.md) · 易错 [mistakes.md](./mistakes.md)。
+
+用浏览器读：仓库根执行 `./site/serve.sh`，打开 http://127.0.0.1:8765/site/
 
 对照上游：[`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b)（2026-08-13）。本机检出：仓库根的 `../deepseek-harness/`。讲义里的上游链接一律指向该 commit 的 GitHub 页面，在网页上可点；本机对照同一相对路径即可。
 

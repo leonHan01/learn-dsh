@@ -28,13 +28,17 @@
 - `packages/shell/tool-bash/src/`
 - 相邻：[`subprocess`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/subprocess.zh.md)、[`sandbox`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/sandbox.zh.md)、[`filesystem`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/filesystem.zh.md) 各读开头
 
-```
-        ctx.shell  (Definition: ShellExecutor)
-           ▲  ▲
-           │  └──────────────┐
-    dsh-bash-local      dsh-bash-sandbox     Providers
-           │
-    dsh-tool-bash  ──ctx.tools.register──▶ 模型看到 bash
+```mermaid
+flowchart TB
+  def["ctx.shell · Definition"]
+  local["dsh-bash-local"]
+  sand["dsh-bash-sandbox"]
+  tool["dsh-tool-bash"]
+  model["模型看到 bash"]
+  local --> def
+  sand --> def
+  tool --> def
+  tool --> model
 ```
 
 同一时刻一棵树只挂一个 `ctx.shell` 提供方。Consumer 检测 `sandboxMode` 能力位，决定要不要在工具 schema 上暴露升级字段。**Consumer 不 import 提供方包。**
