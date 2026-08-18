@@ -13,9 +13,20 @@
 | 2:30–3:30 | plan、hooks、权限预设 |
 | 3:30–4:30 | 抄门禁 + 过关 |
 
-组入口：[`packages/interaction/`](../../deepseek-harness/packages/interaction/README.md)。
+组入口：[`packages/interaction/`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/interaction/README.md)。
 
 ---
+
+图：[architecture.md §22](./architecture.md#22-人类通道与模型通道)。
+
+```mermaid
+flowchart LR
+  h["人类"] -->|"/goal"| cmd["ctx.commands"]
+  h -->|"普通句子"| fu["followup"]
+  m["模型"] --> tool["tools.execute"]
+  tool --> ask["pre-execute ask"]
+  ask --> appr["ctx.approval"]
+```
 
 ## 一、两条通道
 
@@ -50,7 +61,7 @@
 
 ## 二、命令平面
 
-对照：[`docs/subsystems/commands.zh.md`](../../deepseek-harness/docs/subsystems/commands.zh.md)
+对照：[`docs/subsystems/commands.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/commands.zh.md)
 
 `ctx.commands`：发现、解析、分发、取消、结果渲染。适配器（Web、TUI、headless）负责把用户输入喂进来。
 
@@ -64,9 +75,9 @@
 
 对照：
 
-- [`docs/subsystems/approval.zh.md`](../../deepseek-harness/docs/subsystems/approval.zh.md)
-- [`docs/subsystems/user-questions.zh.md`](../../deepseek-harness/docs/subsystems/user-questions.zh.md)
-- [`docs/subsystems/permission-presets.zh.md`](../../deepseek-harness/docs/subsystems/permission-presets.zh.md)
+- [`docs/subsystems/approval.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/approval.zh.md)
+- [`docs/subsystems/user-questions.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/user-questions.zh.md)
+- [`docs/subsystems/permission-presets.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/permission-presets.zh.md)
 
 ### 审批是一次性的
 
@@ -99,7 +110,7 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 
 ## 四、Plan 模式
 
-对照：[`docs/subsystems/plan.zh.md`](../../deepseek-harness/docs/subsystems/plan.zh.md)
+对照：[`docs/subsystems/plan.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/plan.zh.md)
 
 Plan 是**仅记日志的协作状态**，不是调度器。`plan/mode` 事件记录进/出。待定选择在退出时冲刷。退出走 `exit_plan_mode` 审阅流程。
 
@@ -109,7 +120,7 @@ Plan 是**仅记日志的协作状态**，不是调度器。`plan/mode` 事件�
 
 ## 五、Hooks
 
-对照：[`packages/hooks/README.md`](../../deepseek-harness/packages/hooks/README.md)、extension-cookbook「钩子系统」行。
+对照：[`packages/hooks/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/hooks/README.md)、extension-cookbook「钩子系统」行。
 
 「原生钩子」= 普通 Cordis 插件，听这些扩展点：
 
@@ -136,11 +147,14 @@ waterfall 返回类型化决策。`turn-stopping` 是 serial，可以通过 stee
 
 ## 七、作业
 
-写 [`learn/11-人机交互.md`](../11-人机交互.md)。画两条通道；列 4 个「用户/模型说了 X → 走哪」的例子。
+写 [11-人机交互.md](../11-人机交互.md)。画两条通道；列 4 个「用户/模型说了 X → 走哪」的例子。
 
----
+## 八、明日预告
 
-### 参考答案
+最后一天：产品表面怎么挑入口，以及改这个仓库时必须遵守的工程规矩。
+
+<details>
+<summary>参考答案</summary>
 
 1. 它是人类命令，由 `ctx.commands` 解释，不进模型消息。模型侧另有 goal 工具。领域只有一份。
 2. 命令平面默认只服务 UI。只有处理器去改 goals / session / 其它持久服务时，才产生领域事实。
@@ -149,6 +163,4 @@ waterfall 返回类型化决策。`turn-stopping` 是 serial，可以通过 stee
 5. 存在会话日志的 `plan/mode` 事件里。重启后从日志投影恢复，不靠内存旗标。
 6. 听 `tools/result`（或 `pre-execute` 若要在执行前记）。改 `tool-bash` 会漏掉其它工具，也把审计焊进能力包。
 
-## 八、明日预告
-
-最后一天：产品表面怎么挑入口，以及改这个仓库时必须遵守的工程规矩。
+</details>

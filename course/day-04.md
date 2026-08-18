@@ -21,20 +21,33 @@
 
 对照：
 
-- [`packages/core/scope/README.zh.md`](../../deepseek-harness/packages/core/scope/README.zh.md)
-- [`docs/subsystems/scope.zh.md`](../../deepseek-harness/docs/subsystems/scope.zh.md)
-- [`packages/core/scope/src/index.ts`](../../deepseek-harness/packages/core/scope/src/index.ts)
+- [`packages/core/scope/README.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/scope/README.zh.md)
+- [`docs/subsystems/scope.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/scope.zh.md)
+- [`packages/core/scope/src/index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/scope/src/index.ts)
 
 ### 它解决什么问题
 
 每个 agent 要能拥有「只属于自己」的工具、提示词段、变量、监听器，并且 agent dispose 时这些注册一起消失。全局插件仍然对所有人可见。
 
-只有两层：
+先当扁平两层（第 3 天约定；preset 父链第 7 / 10 天再看）：
 
 - **全局**：普通 `ctx` 上的注册，所有 agent 看得见（除非被 restrict）
 - **带作用域**：`agent.ctx` 上的注册，只对这一个 agent 可见
 
-没有「子 scope 自动继承父 agent 的工具」。父子关系是 **lineage 数据**（`parentSession`、`delegationDepth`），不影响可见性。这是最容易读错的一点，第 10 天还会再考。
+没有「子 agent 自动继承父 agent 的工具」。父子关系是 **lineage 数据**（`parentSession`、`delegationDepth`），不影响可见性。第 10 天还会再考。
+
+```mermaid
+flowchart TB
+  subgraph vis["可见性"]
+    g["全局 ctx"]
+    a["agent A.ctx"]
+    b["agent B.ctx"]
+  end
+  a -.->|"不继承工具"| b
+  lin["parentSession / delegationDepth"] -.->|"不影响可见性"| vis
+```
+
+图：[architecture.md §14](./architecture.md#14-scope-不是谱系) · [§6](./architecture.md#6-日志是真源surface-才进模型) · [§15](./architecture.md#15-两个-inbox)。
 
 ### 四个配套概念
 
@@ -65,12 +78,12 @@ scope **不是沙箱，也不是权限边界**。它只路由受信任的同进�
 
 对照：
 
-- [`packages/core/session/README.zh.md`](../../deepseek-harness/packages/core/session/README.zh.md)
-- [`docs/subsystems/session.zh.md`](../../deepseek-harness/docs/subsystems/session.zh.md)
+- [`packages/core/session/README.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/session/README.zh.md)
+- [`docs/subsystems/session.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/session.zh.md)
 - 源码按这个顺序：
-  1. [`src/types.ts`](../../deepseek-harness/packages/core/session/src/types.ts)
-  2. [`src/surface.ts`](../../deepseek-harness/packages/core/session/src/surface.ts)
-  3. [`src/index.ts`](../../deepseek-harness/packages/core/session/src/index.ts)
+  1. [`src/types.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/session/src/types.ts)
+  2. [`src/surface.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/session/src/surface.ts)
+  3. [`src/index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/session/src/index.ts)
 
 `dsh-session` **不负责落盘**。它是内存里的事件存储。持久化是另一个 seam（第 9 天）。插件听 `session/event`，在 `session/flush` 时把副本写出去。
 
@@ -133,30 +146,27 @@ chunk 是同一条 assistant 消息的增量。surface 只要最终那条 `assis
 
 ---
 
-## 三、实验：读 20 行真实 jsonl
+## 三、实验：读一份短 jsonl
 
-打开：
+今天用 **text-turn**（一次纯文本对话，约 20 行），不要用 advanced-toolchain（那份 `request/header` 会淹没你）。
 
-[`examples/headless-agent/tests/snapshots/advanced-toolchain/session.jsonl`](../../deepseek-harness/examples/headless-agent/tests/snapshots/advanced-toolchain/session.jsonl)
-
-用 `jq` 只看类型（避免被超长 `request/header` 淹没）：
+[`examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl)
 
 ```sh
-cd /Users/leon/Downloads/leonlearn/learn_dsh/deepseek-harness
+cd ../deepseek-harness
 python3 -c '
 import json
-p="examples/headless-agent/tests/snapshots/advanced-toolchain/session.jsonl"
+p="examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl"
 for i,line in enumerate(open(p)):
     o=json.loads(line)
     t=o.get("type", "?")
     seq=o.get("seq", "-")
     extra=""
-    if t=="session": extra=f" id={o.get(\"id\",\"\")[:8]} ver={o.get(\"version\")}"
-    if t.endswith("/start") or t.endswith("/end"): extra=f" {o.get(\"data\",{})}"
-    if t in ("user/message","assistant/message","tool/result"): extra=f" surfaceOp={o.get(\"surfaceOp\")}"
-    if t=="tool/call": extra=f" {o[\"data\"][\"name\"]}"
+    if t=="session": extra=f" id={str(o.get(\"id\",\"\"))[:8]}"
+    data=o.get("data") or {}
+    if t.endswith("/start") or t.endswith("/end"): extra+=f" {data}"
+    if t in ("user/message","assistant/message","tool/result"): extra+=f" surfaceOp={o.get(\"surfaceOp\")}"
     print(f"{i:02d} seq={seq} {t}{extra}")
-    if i>=30: break
 '
 ```
 
@@ -171,17 +181,13 @@ step/start
 user/message             surfaceOp=append     ← 模型历史第 1 条
 session/title
 request/header           系统提示词 + tools    ← 不进 deriveMessages
-assistant/chunk *        流式 tool-call
+assistant/chunk *        流式文本
 assistant/message        surfaceOp=append     ← 模型历史第 2 条
-tool/call                过程，不进 surface
-tool/result              surfaceOp=append     ← 模型历史第 3 条
 step/end
-step/start               下一步
+turn/end
 ```
 
-数一数：到第一个 `step/end` 为止，`deriveMessages()` 会得到几条消息？（3：user、assistant、tool/result。）`assistant/chunk` 有好几条，都不算。
-
-再打开同一目录的 `input.json` 和 `stream-json.expected.jsonl`，建立「输入 → 会话日志 → 对外输出」的对应。不必读懂 advanced 流程在干什么。
+`deriveMessages()` 得到 2 条：user、assistant。chunk 不算。这份 snapshot 没有 `tool/call`。带工具的链明天用 `bash-tool`。
 
 ---
 
@@ -196,11 +202,14 @@ step/start               下一步
 
 ## 五、作业
 
-写 [`learn/04-session.md`](../04-session.md)。除四节模板外，贴你标注过的前 20 行类型序列，并写出到第一个 `step/end` 时 `deriveMessages()` 的消息列表（角色即可）。
+写 [04-session.md](../04-session.md)。除四节模板外，贴你标注过的类型序列，并写出到 `step/end` 时 `deriveMessages()` 的消息列表（角色即可）。
 
----
+## 六、明日预告
 
-### 参考答案
+`system-prompt` 与 `tools`。会换一份带 `bash` 调用的短 jsonl 看 `request/header`。
+
+<details>
+<summary>参考答案</summary>
 
 1. 看不到。scope 不向子 agent 继承。子是新的 scope key；父子只活在 lineage 数据里。
 2. `events` 含边界、chunk、header、inbox splice 等非消息事实。模型只要 surface 投影出的 `Message` 数组。
@@ -209,6 +218,4 @@ step/start               下一步
 5. 不会。`parentSession` 是谱系，不参与可见性。
 6. 只放内存的话，resume 后孩子会被当成顶层，委派预算重置。
 
-## 六、明日预告
-
-`system-prompt` 怎么把段和工具 schema 拼成一次请求；`tools` 注册表和三条 waterfall。会回头看 jsonl 里那条巨大的 `request/header`。
+</details>

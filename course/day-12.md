@@ -29,11 +29,11 @@
 
 | 表面 | 何时读 | 入口 |
 |---|---|---|
-| Web GUI | 改 Chat、Host、卡片 | `packages/host`、`packages/client` 的组 README；[web-server](../../deepseek-harness/docs/subsystems/web-server.zh.md)、[client-modules](../../deepseek-harness/docs/subsystems/client-modules.zh.md)、[adding-a-conversation-node](../../deepseek-harness/docs/cookbook/adding-a-conversation-node.zh.md) |
+| Web GUI | 改 Chat、Host、卡片 | `packages/host`、`packages/client` 的组 README；[web-server](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/web-server.zh.md)、[client-modules](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/client-modules.zh.md)、[adding-a-conversation-node](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/adding-a-conversation-node.zh.md) |
 | TypeScript SDK | 进程外驱动 | `packages/sdk` + `examples/jsonrpc-agent` |
 | ACP | 编辑器 / 自动化客户端 | `packages/acp` + `examples/acp-agent` |
-| Python SDK | 非 TS 宿主 | `python/README.zh.md`、[python-sdk 指南](../../deepseek-harness/docs/user/guide/python-sdk.zh.md) |
-| Typert / API 网关 | 远程 RPC / BFF | [api-gateway](../../deepseek-harness/docs/api-gateway.zh.md)、[typert](../../deepseek-harness/docs/subsystems/typert.zh.md) |
+| Python SDK | 非 TS 宿主 | `python/README.zh.md`、[python-sdk 指南](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/guide/python-sdk.zh.md) |
+| Typert / API 网关 | 远程 RPC / BFF | [api-gateway](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/api-gateway.zh.md)、[typert](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/typert.zh.md) |
 
 ### 今天只选一条，读它的 README + 一份 example
 
@@ -52,11 +52,11 @@ ACP 是「协议驱动」范例：stdio 拥有 stdout，工厂创建/恢复 agen
 
 按这个顺序：
 
-1. 根 [`AGENTS.md`](../../deepseek-harness/AGENTS.md) 的 Conventions
-2. [`docs/defensive-patterns.zh.md`](../../deepseek-harness/docs/defensive-patterns.zh.md)（做生命周期 / 并发 / 子进程 / teardown 时必读）
-3. [`docs/testing.zh.md`](../../deepseek-harness/docs/testing.zh.md)
-4. [`docs/development.zh.md`](../../deepseek-harness/docs/development.zh.md) 里和你有关的小节
-5. 任选一篇 [`docs/postmortem/`](../../deepseek-harness/docs/postmortem/README.zh.md)，建议 [0001](../../deepseek-harness/docs/postmortem/0001-acp-default-export-drops-inject.zh.md) 或 [0002](../../deepseek-harness/docs/postmortem/0002-js-expression-disabled-filesystem-tools.zh.md)
+1. 根 [`AGENTS.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/AGENTS.md) 的 Conventions
+2. [`docs/defensive-patterns.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/defensive-patterns.zh.md)（做生命周期 / 并发 / 子进程 / teardown 时必读）
+3. [`docs/testing.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/testing.zh.md)
+4. [`docs/development.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/development.zh.md) 里和你有关的小节
+5. 任选一篇 [`docs/postmortem/`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/postmortem/README.zh.md)，建议 [0001](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/postmortem/0001-acp-default-export-drops-inject.zh.md) 或 [0002](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/postmortem/0002-js-expression-disabled-filesystem-tools.zh.md)
 
 ### 会反复撞上的规矩
 
@@ -143,11 +143,22 @@ ACP 是「协议驱动」范例：stdio 拥有 stdout，工厂创建/恢复 agen
 
 ## 六、作业
 
-写 [`learn/12-工程与表面.md`](../12-工程与表面.md)。包含「下一步」清单，以及你读的那篇 postmortem 的四问答案。
+写 [12-工程与表面.md](../12-工程与表面.md)。包含「下一步」清单，以及你读的那篇 postmortem 的四问答案。
 
----
+## 七、课程序列到此结束
 
-### 参考答案
+回头看 [00-学习路径.md](../00-学习路径.md) 里「先不要读什么」。那些推迟项现在可以按需解禁，但仍然不要线性翻 `packages/client`。
+
+常用复习入口：
+
+- 忘了 turn 流程 → [architecture.md §4](./architecture.md#4-一轮对话-turn--step--round)
+- 忘了事件域名 → [§5](./architecture.md#5-三类事件)
+- 要挂东西 → [§9](./architecture.md#9-想加-x-挂哪)
+- 表面怎么接 → [§23](./architecture.md#23-产品表面都是适配器)
+- 要读包 → README → 子系统页 → `src/index.ts`
+
+<details>
+<summary>参考答案</summary>
 
 1. 一次 prompt 只保证入队。整 agent 的状态另发通知。把 turn 结束绑在 prompt 方法上，会让 UI 和自动化无法中途 steer / cancel。
 2. 先改工具的 `presentCall` / `presentResult`。client 只映射 `card` 标签。新节点类型才走 ConversationNode cookbook。
@@ -156,13 +167,4 @@ ACP 是「协议驱动」范例：stdio 拥有 stdout，工厂创建/恢复 agen
 5. `docs/architecture.md` 的 turn 流程，以及任何因此过时的 lifecycle 图。
 6. 不能。archived 已冻结，不是现行权威。看 `implemented/` 和当前 README。
 
-## 七、课程序列到此结束
-
-回头看 [`00-学习路径.md`](../00-学习路径.md) 里「先不要读什么」。那些推迟项现在可以按需解禁，但仍然不要线性翻 `packages/client`。
-
-常用复习入口：
-
-- 忘了 turn 流程 → 第 3 天讲义 + 你自己画的图
-- 忘了事件域名 → glossary + 第 3 天三类表
-- 要挂东西 → architecture 文末表 + 第 8 天 cookbook
-- 要读包 → README → 子系统页 → `src/index.ts`
+</details>

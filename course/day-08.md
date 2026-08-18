@@ -4,7 +4,7 @@
 **时长：** 6 小时
 **今天结束时你能：** 画出 shell 三角；解释 request / spec 为什么拆开；写出一个带 schema、renderer、卡片意图的工具，并用 hook 拒绝一次调用。
 
-这是核心课最后一天。工具按官方形状写，不要发明 API。
+这是核心课最后一天。工具按官方形状写，不要发明 API。三角图：[architecture.md §8](./architecture.md)。
 
 ## 时间表
 
@@ -21,12 +21,12 @@
 
 对照：
 
-- [`packages/shell/README.md`](../../deepseek-harness/packages/shell/README.md)
-- [`packages/shell/shell/README.md`](../../deepseek-harness/packages/shell/shell/README.md)
-- [`docs/subsystems/shell.zh.md`](../../deepseek-harness/docs/subsystems/shell.zh.md)
+- [`packages/shell/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/shell/README.md)
+- [`packages/shell/shell/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/shell/shell/README.md)
+- [`docs/subsystems/shell.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/shell.zh.md)
 - `packages/shell/shell/src/`（先 `types.ts` 再 `index.ts`）
 - `packages/shell/tool-bash/src/`
-- 相邻：[`subprocess`](../../deepseek-harness/docs/subsystems/subprocess.zh.md)、[`sandbox`](../../deepseek-harness/docs/subsystems/sandbox.zh.md)、[`filesystem`](../../deepseek-harness/docs/subsystems/filesystem.zh.md) 各读开头
+- 相邻：[`subprocess`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/subprocess.zh.md)、[`sandbox`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/sandbox.zh.md)、[`filesystem`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/filesystem.zh.md) 各读开头
 
 ```
         ctx.shell  (Definition: ShellExecutor)
@@ -77,8 +77,8 @@ ShellExecSpec        执行器看到的完整、已解析描述
 
 对照：
 
-- [`docs/cookbook/adding-an-llm-adapter.zh.md`](../../deepseek-harness/docs/cookbook/adding-an-llm-adapter.zh.md)
-- [`packages/llm/llm-deepseek/src/adapter.ts`](../../deepseek-harness/packages/llm/llm-deepseek/src/adapter.ts) 浏览
+- [`docs/cookbook/adding-an-llm-adapter.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/adding-an-llm-adapter.zh.md)
+- [`packages/llm/llm-deepseek/src/adapter.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/llm/llm-deepseek/src/adapter.ts) 浏览
 
 和 shell 同一形状：`dsh-llm` 定义词汇和注册表，`dsh-llm-deepseek` 是提供方，loop 是 Consumer。今天只确认「注册适配器和注册 shell 后端是同一类动作」，不要顺着 SSE 解析往下走。
 
@@ -88,9 +88,9 @@ ShellExecSpec        执行器看到的完整、已解析描述
 
 严格按：
 
-1. [`user/develop/basic/tool.zh.md`](../../deepseek-harness/docs/user/develop/basic/tool.zh.md)（你第 2 天做过最小版）
-2. [`cookbook/adding-a-tool.zh.md`](../../deepseek-harness/docs/cookbook/adding-a-tool.zh.md)
-3. [`cookbook/extension-cookbook.zh.md`](../../deepseek-harness/docs/cookbook/extension-cookbook.zh.md) 的权限门禁
+1. [`user/develop/basic/tool.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/develop/basic/tool.zh.md)（你第 2 天做过最小版）
+2. [`cookbook/adding-a-tool.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/adding-a-tool.zh.md)
+3. [`cookbook/extension-cookbook.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/extension-cookbook.zh.md) 的权限门禁
 
 在 `scratch-plugin/` 里把 greet 升级成一个**有领域语义**的工具，例如 `word_count`：
 
@@ -141,23 +141,12 @@ export function apply(ctx: Context) {
 
 ## 五、作业
 
-写 [`learn/08-capability-seam.md`](../08-capability-seam.md)：
+写 [08-capability-seam.md](../08-capability-seam.md)：
 
-- shell 三角图
+- shell 三角图（可对照 [architecture.md §8](./architecture.md)）
 - 另选一个 seam（建议 `fs` 或 `web`）自己填 Definition / Provider / Consumer
 - 你写的工具的 schema 和一张卡片草图
 - 为什么 deny 不写在 execute 里（五句以内）
-
----
-
-### 参考答案
-
-1. request 是调用方意图（字段多可选）；spec 是执行器看到的完整描述。拥有方（shell 包）的 `resolve` 负责补齐和校验。
-2. `pre-execute`（或 `guard`）。策略属于横切层，不属于 bash 能力实现。
-3. 依赖提供方会把本地 subprocess 焊死，远程/沙箱后端无法替换。只依赖 `dsh-shell`。
-4. 非零退出是领域结果，模型要看见退出码。reject 只留给基础设施失败。
-5. 展示器必须是纯函数，实时和回放都会跑。磁盘内容属于 `execute` 的规范值或 `presentationMeta`，不属于 `presentCall`。
-6. 后台没有超时。`ctx.jobs.start` 发布之后，外层 `exec.signal` 只停等待，不杀已发布进程。杀进程走 `job_kill` / owner dispose。
 
 ## 六、核心课结束之后
 
@@ -169,3 +158,15 @@ export function apply(ctx: Context) {
 - 看懂产品是怎么叠出来的
 
 第 9–12 天是进阶周，按需上。要改持久化 / 压缩走第 9 天；要搞懂 subagent / Ralph 走第 10 天；要做审批 / 命令走第 11 天；要动 Web 或准备贡献代码走第 12 天。
+
+<details>
+<summary>参考答案</summary>
+
+1. request 是调用方意图（字段多可选）；spec 是执行器看到的完整描述。拥有方（shell 包）的 `resolve` 负责补齐和校验。
+2. `pre-execute`（或 `guard`）。策略属于横切层，不属于 bash 能力实现。
+3. 依赖提供方会把本地 subprocess 焊死，远程/沙箱后端无法替换。只依赖 `dsh-shell`。
+4. 非零退出是领域结果，模型要看见退出码。reject 只留给基础设施失败。
+5. 展示器必须是纯函数，实时和回放都会跑。磁盘内容属于 `execute` 的规范值或 `presentationMeta`，不属于 `presentCall`。
+6. 后台没有超时。`ctx.jobs.start` 发布之后，外层 `exec.signal` 只停等待，不杀已发布进程。杀进程走 `job_kill` / owner dispose。
+
+</details>

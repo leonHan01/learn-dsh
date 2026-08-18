@@ -4,6 +4,8 @@
 
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（`dsh`）的学习材料：一门从插件运行时讲到 agent loop 的 12 天课程，放在上游检出旁边使用。
 
+**上课用中文讲义。** 入口：[course/README.md](course/README.md)。架构图：[course/architecture.md](course/architecture.md)。对照上游 [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b)（2026-08-13）。
+
 这不是 fork，也不是 DeepSeek 官方项目。把 [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) clone 到本仓库旁边。本仓库是课程和你的笔记。
 
 本机常见布局：
@@ -63,8 +65,9 @@ dsh 处于 **开发者预览**，API 会破。以当前包 README 和 `docs/` �
   00-学习路径.md            全图：阶段、过关标准、先跳过什么
   course/
     README.md               课程目录
-    day-01.md … day-12.md   讲义（目标、讲解、实验、测验、答案）
-  01-….md                   你自己写的作业
+    architecture.md         架构图
+    day-01.md … day-12.md   讲义
+  01-跑起来.md …            作业模板（填空）
 ```
 
 旁边检出里课程真正会用到的部分：
@@ -119,7 +122,7 @@ pnpm dsh --profile web --dump-config  # 实际启动的插件树
 pnpm dsh --profile headless "用一句话介绍你自己"
 ```
 
-然后打开 **[第 1 天](course/day-01.md)**。不要从 `packages/` 读起。
+然后打开 **[第 1 天](course/day-01.md)**。讲义指向图时先看 **[architecture.md](course/architecture.md)**。不要从 `packages/` 读起。
 
 第一个小时只回答三件事：它能跑、它是一棵插件树、树可以从配置看到。
 
@@ -177,7 +180,8 @@ pnpm dsh --profile headless "用一句话介绍你自己"
 | 3 | [架构地图](course/day-03.md) | 能画出 turn 流程，分清三类事件 |
 | 4 | [scope + session](course/day-04.md) | 能在真实 `session.jsonl` 上标出 surface 事件 |
 | 5 | [system-prompt + tools](course/day-05.md) | 能从 `register` 追到 `request/header` |
-| 6 | [llm + agent + agent-loop](course/day-06.md) | 能在 `agent.ts` 里走完一步 step |
+| 6 | [llm + agent 接口](course/day-06.md) | 能说明 UI 为何只依赖 `ctx.agents` |
+| 6 续 | [agent-loop](course/day-06-loop.md) | 能在 `agent.ts` 里走完一步 step |
 | 7 | [启动与组合](course/day-07.md) | 能 diff `web` 与 `headless` 两棵树 |
 | 8 | [shell seam + 写工具](course/day-08.md) | 能加工具和 deny 钩子，且不改 loop |
 | 9 | [会话数据平面](course/day-09.md) | 分清持久化、surface、compaction |
@@ -216,21 +220,21 @@ pnpm dsh --profile headless "用一句话介绍你自己"
 
 ## 官方文档
 
-下表路径相对于旁边的 `deepseek-harness/` 检出。GitHub 上在 [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)。
+钉在 [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b)。本机同一文件在 `../deepseek-harness/`。
 
 | 文档 | 角色 |
 |---|---|
-| [架构](../deepseek-harness/docs/architecture.zh.md) | 跨子系统行为（必读） |
-| [术语表](../deepseek-harness/docs/glossary.zh.md) | 领域语言（必读） |
-| [Cordis 入门](../deepseek-harness/docs/cordis-primer.zh.md) | 一页插件模型 |
-| [Cordis 教程](../deepseek-harness/docs/cordis-tutorial/index.zh.md) | 动手，无需 API key |
-| [Agent 生命周期](../deepseek-harness/docs/agent-lifecycle.zh.md) | 轮次 / 步骤时序图 |
-| [工具执行流水线](../deepseek-harness/docs/tool-execution-pipeline.zh.md) | 策略在 loop 外何处运行 |
-| [子系统](../deepseek-harness/docs/subsystems/README.zh.md) | 单服务词汇（查阅） |
-| [文档图索引](../deepseek-harness/docs/graph-atlas.zh.md) | 生成图与人工图的目录 |
-| [Cookbook](../deepseek-harness/docs/cookbook/extension-cookbook.zh.md) | 如何扩展 |
-| [测试](../deepseek-harness/docs/testing.zh.md) | 每条测试命令被允许证明什么 |
-| 上游 [README](../deepseek-harness/README.zh.md) | 把 dsh 当产品跑 |
+| [架构](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/architecture.zh.md) | 跨子系统行为（必读） |
+| [术语表](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/glossary.zh.md) | 领域语言（必读） |
+| [Cordis 入门](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-primer.zh.md) | 一页插件模型 |
+| [Cordis 教程](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-tutorial/index.zh.md) | 动手，无需 API key |
+| [Agent 生命周期](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/agent-lifecycle.zh.md) | 轮次 / 步骤时序图 |
+| [工具执行流水线](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/tool-execution-pipeline.zh.md) | 策略在 loop 外何处运行 |
+| [子系统](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/README.zh.md) | 单服务词汇（查阅） |
+| [文档图索引](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/graph-atlas.zh.md) | 生成图与人工图的目录 |
+| [Cookbook](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/extension-cookbook.zh.md) | 如何扩展 |
+| [测试](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/testing.zh.md) | 每条测试命令被允许证明什么 |
+| 上游 [README](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/README.zh.md) | 把 dsh 当产品跑 |
 
 ## 许可证
 

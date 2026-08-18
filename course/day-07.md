@@ -15,17 +15,27 @@
 
 ---
 
+图：[architecture.md §2](./architecture.md#2-运行中的-dsh-是一棵插件树) · [§19](./architecture.md#19-从-dsh-web-到第一轮)。
+
+```mermaid
+flowchart LR
+  cli["dsh web"] --> compose["空列表 + 各层 patch"]
+  compose --> boot["Loader + assert ACTIVE"]
+  boot --> create["agents.create"]
+  create --> turn["第一轮 followup"]
+```
+
 ## 一、空列表变成产品的五层
 
 对照：
 
-- [`packages/boot/app-boot/README.md`](../../deepseek-harness/packages/boot/app-boot/README.md) 的 Profiles 一节
-- [`packages/bundle/README.md`](../../deepseek-harness/packages/bundle/README.md)
-- [`packages/bundle/base/README.md`](../../deepseek-harness/packages/bundle/base/README.md)
-- [`packages/bundle/web-app/README.md`](../../deepseek-harness/packages/bundle/web-app/README.md)
-- [`packages/bundle/headless/README.md`](../../deepseek-harness/packages/bundle/headless/README.md)
-- [`apps/cli/README.md`](../../deepseek-harness/apps/cli/README.md)
-- [`apps/cli/src/bin.ts`](../../deepseek-harness/apps/cli/src/bin.ts)、[`src/args.ts`](../../deepseek-harness/apps/cli/src/args.ts)
+- [`packages/boot/app-boot/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/boot/app-boot/README.md) 的 Profiles 一节
+- [`packages/bundle/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/bundle/README.md)
+- [`packages/bundle/base/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/bundle/base/README.md)
+- [`packages/bundle/web-app/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/bundle/web-app/README.md)
+- [`packages/bundle/headless/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/bundle/headless/README.md)
+- [`apps/cli/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/apps/cli/README.md)
+- [`apps/cli/src/bin.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/apps/cli/src/bin.ts)、[`src/args.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/apps/cli/src/args.ts)
 
 启动不是「跑一个 main 再 require 一堆模块」。它是：
 
@@ -89,11 +99,13 @@ Home：`$DSH_HOME`，否则 `~/.dsh`。里面还有分层 `.env`（进程环境 
 ## 二、实验：diff 两棵树
 
 ```sh
-cd /Users/leon/Downloads/leonlearn/learn_dsh/deepseek-harness
+cd ../deepseek-harness
 pnpm dsh --profile web --dump-config > /tmp/dsh-web.yml
 pnpm dsh --profile headless --dump-config > /tmp/dsh-headless.yml
 diff -u /tmp/dsh-web.yml /tmp/dsh-headless.yml | less
 ```
+
+对照 [architecture.md §2](./architecture.md)。
 
 作业里要交：
 
@@ -101,13 +113,13 @@ diff -u /tmp/dsh-web.yml /tmp/dsh-headless.yml | less
 2. **只在 web** 的 5 个条目（宿主、路由、client 相关）
 3. **只在 headless** 的条目（runner）
 
-读不懂的 config 字段去 [`config-catalog.zh.md`](../../deepseek-harness/docs/config-catalog.zh.md) 查，不通读。
+读不懂的 config 字段去 [`config-catalog.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/config-catalog.zh.md) 查，不通读。
 
 再打开：
 
-- [`apps/cli/composition.md`](../../deepseek-harness/apps/cli/composition.md)（生成的组合图）
-- [`packages/bundle/base/cordis.patch.yml`](../../deepseek-harness/packages/bundle/base/cordis.patch.yml) 前 80 行
-- 第 2 天标过的 [`examples/headless-agent/cordis.yml`](../../deepseek-harness/examples/headless-agent/cordis.yml)
+- [`apps/cli/composition.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/apps/cli/composition.md)（生成的组合图）
+- [`packages/bundle/base/cordis.patch.yml`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/bundle/base/cordis.patch.yml) 前 80 行
+- 第 2 天标过的 [`examples/headless-agent/cordis.yml`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/headless-agent/cordis.yml)
 
 例子叶子和产品 profile 不是同一条路：叶子是一份完整 `cordis.yml` 直接喂给 demo bin；产品是空列表 + 多层 patch。概念相同（都是条目列表），组装方式不同。
 
@@ -157,11 +169,14 @@ headless 把倒数第二步换成 runner：把命令行字符串当成第一条 
 
 ## 五、作业
 
-写 [`learn/07-启动组合.md`](../07-启动组合.md)。必须有启动序列图，以及 web / headless dump-config 的三点对比。
+写 [07-启动组合.md](../07-启动组合.md)。必须有启动序列图，以及 web / headless dump-config 的三点对比。
 
----
+## 六、明日预告
 
-### 参考答案
+精读 shell seam，按 cookbook 写一个正经工具。
+
+<details>
+<summary>参考答案</summary>
 
 1. patch 按 id 整份替换 config，不做 deep-merge。不重述的字段等于丢掉 bundle 默认值。
 2. 只允许在条目的 `config` 和 `disabled`。`name` 必须是静态模块指定符，否则解析和 HMR 按 id 对比会失去意义。
@@ -170,6 +185,4 @@ headless 把倒数第二步换成 runner：把命令行字符串当成第一条 
 5. 产品 `boot()` 调用 `assertEntriesActivated`：启用却 PENDING 是启动错误。教程启动器没有这层。
 6. 叶子是一份完整 `cordis.yml` 直接挂树。profile 从空列表叠加多层 patch。概念都是条目列表，组装路径不同。
 
-## 六、明日预告
-
-精读 shell seam，按 cookbook 写一个正经工具。主干和启动都通了，今天起你是在「往树上挂能力」，不是在迷宫里走。
+</details>

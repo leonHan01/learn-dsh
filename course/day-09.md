@@ -17,6 +17,17 @@
 
 ---
 
+图：[architecture.md §6](./architecture.md#6-日志是真源surface-才进模型) · [§21](./architecture.md#21-compaction-改窗口)。
+
+```mermaid
+flowchart TB
+  disk["磁盘"] <--> mem["Session.events"]
+  mem --> surface["surface"]
+  surface --> model["deriveMessages"]
+  mem --> header["request/header"]
+  compact["compaction replace"] --> surface
+```
+
 ## 一、三份拷贝，一个真源
 
 ```
@@ -40,7 +51,7 @@ request/header              某一次请求的冻结快照
 
 ## 二、持久化 seam
 
-对照：[`docs/subsystems/persistence.zh.md`](../../deepseek-harness/docs/subsystems/persistence.zh.md)
+对照：[`docs/subsystems/persistence.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/persistence.zh.md)
 
 `dsh-session` 不管盘。`ctx.sessionPersistence` 才是 seam：
 
@@ -76,7 +87,7 @@ JSONL：每会话一个 transcript 路径（`locate` 可能指向尚未落地的
 
 ## 三、compaction：改窗口，不改考古记录
 
-对照：[`docs/subsystems/compaction.zh.md`](../../deepseek-harness/docs/subsystems/compaction.zh.md)、lifecycle 文档后半。
+对照：[`docs/subsystems/compaction.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/compaction.zh.md)、lifecycle 文档后半。
 
 压缩是 seam（`ctx.compaction`），不是 loop 分支。挂载点：
 
@@ -94,7 +105,7 @@ JSONL：每会话一个 transcript 路径（`locate` 可能指向尚未落地的
 - UI 若要给人类看完整 transcript，应使用 **append-origin** 事件，而不是当前 surface（`isAppendSurfaceEvent`，第 4 天 `surface.ts`）
 - 回放某次历史请求，要按当时的 surface generation，不是按现在的窗口
 
-对照 snapshot：[`examples/headless-agent/tests/snapshots/compaction-recovery/`](../../deepseek-harness/examples/headless-agent/tests/snapshots/compaction-recovery/)。用第 4 天的脚本列出类型，找出 `surfaceOp` 不是 `append` 的事件。
+对照 snapshot：[`examples/headless-agent/tests/snapshots/compaction-recovery/`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/headless-agent/tests/snapshots/compaction-recovery/)。用第 4 天的脚本列出类型，找出 `surfaceOp` 不是 `append` 的事件。
 
 ---
 
@@ -102,11 +113,11 @@ JSONL：每会话一个 transcript 路径（`locate` 可能指向尚未落地的
 
 | 主题 | 文档 | 一句话 |
 |---|---|---|
-| 请求上下文 | [`packages/context/README.md`](../../deepseek-harness/packages/context/README.md) | workspace 指令、时间等动态上下文；经 `systemPrompt.context`，不是 section |
-| 投影 | [session-projection.zh.md](../../deepseek-harness/docs/subsystems/session-projection.zh.md) | 从日志折出只读切面（给 UI / 查询），纯函数定义 |
-| 标题 | [session-title.zh.md](../../deepseek-harness/docs/subsystems/session-title.zh.md) | 你在 jsonl 里见过的 `session/title`；异步提供方，引用源消息 seq |
-| 检索 | [session-query.zh.md](../../deepseek-harness/docs/subsystems/session-query.zh.md) | 有界精确读取、关系、全文；模型侧有 `session_query` 类工具 |
-| token 计量 | [token-meter.zh.md](../../deepseek-harness/docs/subsystems/token-meter.zh.md) | 按已消费日志修订号回放度量，不靠「现在窗口有多长」信口估计 |
+| 请求上下文 | [`packages/context/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/context/README.md) | workspace 指令、时间等动态上下文；经 `systemPrompt.context`，不是 section |
+| 投影 | [session-projection.zh.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/session-projection.zh.md) | 从日志折出只读切面（给 UI / 查询），纯函数定义 |
+| 标题 | [session-title.zh.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/session-title.zh.md) | 你在 jsonl 里见过的 `session/title`；异步提供方，引用源消息 seq |
+| 检索 | [session-query.zh.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/session-query.zh.md) | 有界精确读取、关系、全文；模型侧有 `session_query` 类工具 |
+| token 计量 | [token-meter.zh.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/token-meter.zh.md) | 按已消费日志修订号回放度量，不靠「现在窗口有多长」信口估计 |
 
 context 插件写入的 runtime-context 会成为模型历史里带来源的快照。关掉 `includeRuntimeContext` 或 `suppressRuntimeContext()` 会丢掉它们，包括 waterfall 监听器后来加的。策略服务本身还在。
 
@@ -123,11 +134,14 @@ context 插件写入的 runtime-context 会成为模型历史里带来源的快�
 
 ## 六、作业
 
-写 [`learn/09-会话数据平面.md`](../09-会话数据平面.md)。画「磁盘 / 内存 / surface / 某次 request/header」四层，并标注 compaction 作用在哪一层。
+写 [09-会话数据平面.md](../09-会话数据平面.md)。画「磁盘 / 内存 / surface / 某次 request/header」四层，并标注 compaction 作用在哪一层。对照 [architecture.md §6](./architecture.md)。
 
----
+## 七、明日预告
 
-### 参考答案
+四条「让 agent 继续干活」的机制：对照 [architecture.md §10](./architecture.md)。
+
+<details>
+<summary>参考答案</summary>
 
 1. JSONL：每会话一个 transcript 文件，`locate` 给路径。SQLite：多会话共享库。崩溃恢复：冷加载时若轮次未闭合，追加合成 `turn/end { interrupted }`，不截断。
 2. 否则磁盘上的日志重建不出这次模型请求。
@@ -136,6 +150,4 @@ context 插件写入的 runtime-context 会成为模型历史里带来源的快�
 5. append 是同步热路径。等盘会拖住模型流和工具。持久化异步批写，`flush` 才是检查点。
 6. 是。同一 `ctx.compaction`。差别只是触发点：`pre-step` / `request-error` / 手动。
 
-## 七、明日预告
-
-四条「让 agent 继续干活」的机制：subagent、goal、Ralph、workflow。名字像，语义完全不是一回事。
+</details>

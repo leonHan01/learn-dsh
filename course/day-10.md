@@ -16,6 +16,21 @@
 
 ---
 
+图：[architecture.md §10](./architecture.md#10-四条继续干活不要混) · [§14](./architecture.md#14-scope-不是谱系)。
+
+```mermaid
+flowchart TB
+  subgraph same["同一会话"]
+    goal["goal"]
+    jobs["jobs"]
+  end
+  subgraph neu["新会话"]
+    sub["subagent"]
+    ralph["Ralph"]
+    wf["workflow"]
+  end
+```
+
 ## 一、先把五条机制钉死
 
 它们都「让工作继续」，但继续的方式不同。
@@ -40,7 +55,7 @@
 
 ## 二、subagent
 
-对照：[`docs/subsystems/subagent.zh.md`](../../deepseek-harness/docs/subsystems/subagent.zh.md)、[`packages/subagent/`](../../deepseek-harness/packages/subagent/README.md)
+对照：[`docs/subsystems/subagent.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/subagent.zh.md)、[`packages/subagent/`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/subagent/README.md)
 
 和 bash **不同**：同一上下文可以注册**多个**提供方，按名字选。更像 `ctx.llm` 的适配器注册表，不像单例 `ctx.shell`。
 
@@ -60,13 +75,13 @@ fork 子 agent（`subagent_fork`）会把父会话**已完成轮次**做成种�
 
 默认后台跑，立刻返回可继续 id；settle 后父 agent 收到通知。`run_in_background: false` 才同步等结果。
 
-对照：[`examples/headless-agent/tests/snapshots/subagent-settlement/`](../../deepseek-harness/examples/headless-agent/tests/snapshots/subagent-settlement/)。看 parent / child 两份 jsonl：孩子有自己的 header、自己的 `delegationDepth`。
+对照：[`examples/headless-agent/tests/snapshots/subagent-settlement/`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/headless-agent/tests/snapshots/subagent-settlement/)。看 parent / child 两份 jsonl：孩子有自己的 header、自己的 `delegationDepth`。
 
 ---
 
 ## 三、goal
 
-对照：[`docs/subsystems/goal.zh.md`](../../deepseek-harness/docs/subsystems/goal.zh.md)、glossary「目标」
+对照：[`docs/subsystems/goal.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/goal.zh.md)、glossary「目标」
 
 goal 是**状态**，不是调度器。会话日志仍是真源。目标带修订号，阶段：
 
@@ -99,25 +114,25 @@ glossary 原文：一次面向不可变目标的**前台全新 agent** 工作流
 - 共享工作区是长期记忆
 - 跨 Round 只传一份有界结构化 **Ralph 交接**（状态、摘要、证据、后续步骤、阻塞）
 
-对照：[`examples/headless-agent/tests/snapshots/ralph-loop/`](../../deepseek-harness/examples/headless-agent/tests/snapshots/ralph-loop/)。注意多个 `session.*.jsonl`。
+对照：[`examples/headless-agent/tests/snapshots/ralph-loop/`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/headless-agent/tests/snapshots/ralph-loop/)。注意多个 `session.*.jsonl`。
 
 普通「把这个目标做完」用 goal，不要用 Ralph。提示词里写得很凶：只有人类明确要求时才用 `ralph` 工具。
 
 ### workflow
 
-对照：[`docs/subsystems/workflow.zh.md`](../../deepseek-harness/docs/subsystems/workflow.zh.md)
+对照：[`docs/subsystems/workflow.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/workflow.zh.md)
 
 脚本在 worker thread 跑，没有 fs / net / 定时器 / Node API。编排原语：`agent()`、`pipeline()`、`parallel()`、`phase()`。`ralph` 工具内部也走这套引擎，但产品语义不是「通用脚本」。
 
 ### jobs
 
-对照：[`docs/subsystems/jobs.zh.md`](../../deepseek-harness/docs/subsystems/jobs.zh.md)
+对照：[`docs/subsystems/jobs.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/jobs.zh.md)
 
 后台 bash、后台 subagent 的「跑着的那件事」登记处。`job_*` 工具收集或杀掉。不是新的智能体。
 
 ### preset
 
-对照：[`packages/preset/README.md`](../../deepseek-harness/packages/preset/README.md)
+对照：[`packages/preset/README.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/preset/README.md)
 
 按会话用一份 `cordis.yml` 组装 agent：不同工具集、不同 persona。需要独立执行世界的服务行放进 `isolate` realm。header 里的 `agentPreset` 必须和 resume 时一致，否则历史对不上能力。
 
@@ -134,11 +149,14 @@ glossary 原文：一次面向不可变目标的**前台全新 agent** 工作流
 
 ## 六、作业
 
-写 [`learn/10-多智能体.md`](../10-多智能体.md)。一张对比表必须自己填，不要复制今天这张。另写三个「用户说了 X，你选哪条机制」的小题并作答。
+写 [10-多智能体.md](../10-多智能体.md)。一张对比表必须自己填，不要复制今天这张。另写三个「用户说了 X，你选哪条机制」的小题并作答。
 
----
+## 七、明日预告
 
-### 参考答案
+人类通道 vs 模型通道：斜杠命令、审批、提问、plan、hooks。
+
+<details>
+<summary>参考答案</summary>
 
 1. 看不到。scope 两层扁平，不沿 lineage 继承。
 2. Goal Round 是目标策略接纳的续行，计入目标上限。普通人类轮次只是会话里另一次排空，不消耗该上限。
@@ -147,6 +165,4 @@ glossary 原文：一次面向不可变目标的**前台全新 agent** 工作流
 5. 要扇出许多同类子任务、用脚本做 phase / pipeline / 屏障时用 workflow。一两次委派用普通 subagent。
 6. 已经在跑的工具工作（bash、后台 tool）用 jobs。要另一个 agent 思考/行动用 subagent。jobs 没有自己的模型循环。
 
-## 七、明日预告
-
-人类通道 vs 模型通道：斜杠命令、审批、提问、plan、hooks。
+</details>

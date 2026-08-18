@@ -19,11 +19,25 @@
 
 对照：
 
-- [`packages/core/system-prompt/README.zh.md`](../../deepseek-harness/packages/core/system-prompt/README.zh.md)
-- [`docs/subsystems/system-prompt.zh.md`](../../deepseek-harness/docs/subsystems/system-prompt.zh.md)
-- [`packages/core/system-prompt/src/index.ts`](../../deepseek-harness/packages/core/system-prompt/src/index.ts)
+- [`packages/core/system-prompt/README.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/system-prompt/README.zh.md)
+- [`docs/subsystems/system-prompt.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/system-prompt.zh.md)
+- [`packages/core/system-prompt/src/index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/system-prompt/src/index.ts)
 
-循环在每个步骤调用 `ctx.systemPrompt.assemble(...)`，得到一份 `PromptAssembly`：
+循环在每个步骤调用 `ctx.systemPrompt.assemble(...)`，得到一份 `PromptAssembly`。数据怎么流到模型：
+
+```mermaid
+flowchart LR
+  reg["tools.register"] --> prov["tools 提供方"]
+  sec["section / variable"] --> asm["assemble"]
+  prov --> asm
+  asm --> wf["assemble waterfall"]
+  wf --> hdr["request/header"]
+  wf --> model["模型请求"]
+```
+
+图：[architecture.md §16](./architecture.md#16-一次-assemble) · [§7](./architecture.md#7-工具流水线在-loop-外面)。
+
+得到的 `PromptAssembly`：
 
 ```ts
 {
@@ -65,10 +79,10 @@
 
 对照：
 
-- [`packages/core/tools/README.zh.md`](../../deepseek-harness/packages/core/tools/README.zh.md)
-- [`docs/subsystems/tools.zh.md`](../../deepseek-harness/docs/subsystems/tools.zh.md)
-- [`docs/tool-execution-pipeline.zh.md`](../../deepseek-harness/docs/tool-execution-pipeline.zh.md)（复习）
-- 源码：[`src/types.ts`](../../deepseek-harness/packages/core/tools/src/types.ts) → [`src/schema.ts`](../../deepseek-harness/packages/core/tools/src/schema.ts) → [`src/index.ts`](../../deepseek-harness/packages/core/tools/src/index.ts)
+- [`packages/core/tools/README.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/tools/README.zh.md)
+- [`docs/subsystems/tools.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/tools.zh.md)
+- [`docs/tool-execution-pipeline.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/tool-execution-pipeline.zh.md)（复习）
+- 源码：[`src/types.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/tools/src/types.ts) → [`src/schema.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/tools/src/schema.ts) → [`src/index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/tools/src/index.ts)
 
 `ctx.tools` 做三件事：登记工具、决定模型看见哪些、执行时跑完整策略链。
 
@@ -156,13 +170,17 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 
 ### 并行
 
-`isConcurrencySafe(args) === true` 才允许并行。其它（未知、抛错、未声明）一律独占。loop 用滚动池执行，`tool/result` 按模型给出的顺序写回。细节在第 6 天的 `tool-calls.ts`。
+`isConcurrencySafe(args) === true` 才允许并行。其它（未知、抛错、未声明）一律独占。loop 用滚动池执行，`tool/result` 按模型给出的顺序写回。细节在 [第 6 天续](./day-06-loop.md) 的 `tool-calls.ts`。
 
 ---
 
 ## 三、实验：解剖一条 `request/header`
 
-回到昨天的 jsonl，取出 `seq=6` 那条 `request/header`（或你看到的第一条）。它很大。不要通读提示词正文，做三件事：
+换一份带工具的短日志（仍不要用 advanced-toolchain）：
+
+[`examples/jsonrpc-agent/tests/snapshots/bash-tool/session.jsonl`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/bash-tool/session.jsonl)
+
+取出 `request/header`（通常 `seq=6`）。不要通读提示词正文，做三件事：
 
 1. 找到 `header.config.provider` / `model`。
 2. 找到 `header.system` 的前几行。应看到 `You are an AI agent powered by DeepSeek Harness.`——这就是 order −100 的 `harness:identity`。后面的 persona、工具指导是其它 section。
@@ -170,7 +188,7 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 
 再确认：这条 header **没有** `surfaceOp`。它不进 `deriveMessages()`。它是「这次请求用了什么」的锚点，供不变式和回放重建请求。
 
-可选：读 [`packages/core/tools/tests/tools.spec.ts`](../../deepseek-harness/packages/core/tools/tests/tools.spec.ts) 里描述 `restrict` 或 `pre-execute` 的一两段，看测试怎么描述行为。
+可选：读 [`packages/core/tools/tests/tools.spec.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/packages/core/tools/tests/tools.spec.ts) 里描述 `restrict` 或 `pre-execute` 的一两段，看测试怎么描述行为。
 
 ---
 
@@ -185,11 +203,14 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 
 ## 五、作业
 
-写 [`learn/05-tools-and-prompt.md`](../05-tools-and-prompt.md)。用手画「register → assemble → request/header」；列出你在 jsonl 里看到的全部工具名。
+写 [05-tools-and-prompt.md](../05-tools-and-prompt.md)。用手画「register → assemble → request/header」；列出你在 jsonl 里看到的全部工具名。对照 [architecture.md §7](./architecture.md)。
 
----
+## 六、明日预告
 
-### 参考答案
+`dsh-llm` 的消息词汇，`dsh-agent` 接口 vs `dsh-agent-loop` 驱动器，对着源码走完一步 step。这是主干最重的一天：上午接口，下午驱动器；超时就在接口处停。
+
+<details>
+<summary>参考答案</summary>
 
 1. `ToolRuntime` 作为 `systemPrompt.tools()` 提供方 → `assemble()` 得到 `PromptAssembly.tools` → loop 放进请求 → `request/header` 记下这次用的数组。
 2. 换 content 只改模型看见的文本，规范 `value` 仍在，编程消费方（Code Mode）读得到。
@@ -198,6 +219,4 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 5. 挂 `pre-execute`（或 `guard`）。改 execute 会把策略焊进能力，换执行器或复用工具时策略消失。
 6. 抛错，组装失败，本步在任何模型请求前结束。
 
-## 六、明日预告
-
-`dsh-llm` 的消息词汇，`dsh-agent` 接口 vs `dsh-agent-loop` 驱动器，对着源码走完一步 step。这是主干的最后一天，也是最重的一天。
+</details>

@@ -19,7 +19,9 @@
 
 ## 一、配置：错误必须响亮失败
 
-对照：[`05-config.zh.md`](../../deepseek-harness/docs/cordis-tutorial/05-config.zh.md)
+从仓库根：`cd ../deepseek-harness`，继续昨天的 `tmp/cordis-tutorial`。
+
+对照：[`05-config.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-tutorial/05-config.zh.md)
 
 插件同时导出 TypeScript 接口 `Config` 和同名运行时 schema。Cordis 在调用 `apply` **之前**用 schema 校验 YAML 里的 `config`。`apply` 永远收到完整且合法的配置。
 
@@ -55,13 +57,13 @@ export function apply(ctx: Context, config: Config) { /* ... */ }
 
 仓库规矩（后面改 dsh 包会反复撞上）：**可部署旋钮必须是 Config 字段**。插件源码里的 `DEFAULT_*` 常量不是配置。
 
-产品路径的同一套手法见 [`user/develop/basic/config.zh.md`](../../deepseek-harness/docs/user/develop/basic/config.zh.md)。
+产品路径的同一套手法见 [`user/develop/basic/config.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/develop/basic/config.zh.md)。
 
 ---
 
 ## 二、组合：`cordis.yml` 就是应用
 
-对照：[`06-composition-and-hmr.zh.md`](../../deepseek-harness/docs/cordis-tutorial/06-composition-and-hmr.zh.md)
+对照：[`06-composition-and-hmr.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-tutorial/06-composition-and-hmr.zh.md)
 
 到现在为止你写的每个能力都是插件；YAML 选择哪棵树。今天要把 YAML 当成应用本身。
 
@@ -101,7 +103,7 @@ dsh 产品启动器用 `assertEntriesActivated` 把「启用了却一直 PENDING
 
 ## 三、进入 harness：注册一个真工具
 
-对照：[`07-into-the-harness.zh.md`](../../deepseek-harness/docs/cordis-tutorial/07-into-the-harness.zh.md)
+对照：[`07-into-the-harness.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-tutorial/07-into-the-harness.zh.md)
 
 前 6 章是纯 Cordis。这一章第一次碰到 dsh 服务：`ctx.tools`。不调模型、不需要 key。
 
@@ -143,19 +145,30 @@ logger 先打印：`tools/result` 在结果物化时发出，早于 `execute()` 
 
 更完整的约定第 5、8 天再讲。
 
-做完后打开 [`examples/headless-agent/cordis.yml`](../../deepseek-harness/examples/headless-agent/cordis.yml)，试着读每一行。你现在应该能认出「这是在挂哪个服务」。读不懂的行先标出来，第 7 天回头看。
+做完后打开 [`examples/headless-agent/cordis.yml`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/headless-agent/cordis.yml)，试着读每一行。你现在应该能认出「这是在挂哪个服务」。读不懂的行先标出来，第 7 天回头看。
 
 ---
 
 ## 四、挂进 Web UI
 
-对照：[`user/develop/basic/index.zh.md`](../../deepseek-harness/docs/user/develop/basic/index.zh.md)、[`tool.zh.md`](../../deepseek-harness/docs/user/develop/basic/tool.zh.md)
+对照：[`user/develop/basic/index.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/develop/basic/index.zh.md)、[`tool.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/develop/basic/tool.zh.md)
 
 教程启动器和产品启动器不是同一条路。产品用 profile + patch。本地插件通过 `--patch` 插进已启动的 web 树。
 
-在仓库根目录：
+```mermaid
+flowchart LR
+  tree["已启动的 web 树"] --> patch["--patch cordis.yml"]
+  patch --> insert["insert id=hello"]
+  insert --> apply["绝对路径上的 apply"]
+  apply -->|"inject tools"| reg["ctx.tools.register"]
+```
+
+图：[architecture.md §2](./architecture.md#2-运行中的-dsh-是一棵插件树) · [§13](./architecture.md#13-产品-patch-怎么插进去)。
+
+在 **harness 检出根**（`../deepseek-harness`）建练习插件，不要建在本课程仓库里：
 
 ```sh
+cd ../deepseek-harness
 mkdir -p scratch-plugin/src
 ```
 
@@ -187,24 +200,30 @@ export function apply(ctx: Context) {
 }
 ```
 
-`scratch-plugin/cordis.yml`（把路径换成你的绝对路径）：
+`name` 必须是**你机器上的绝对路径**。在 harness 根生成：
+
+```sh
+cd ../deepseek-harness
+python3 -c "import os; print(os.path.abspath('scratch-plugin/src/my-plugin.ts'))"
+```
+
+把打印结果填进 `scratch-plugin/cordis.yml`：
 
 ```yaml
 - insert:
     - id: hello
-      name: '/Users/leon/Downloads/leonlearn/learn_dsh/deepseek-harness/scratch-plugin/src/my-plugin.ts'
+      name: '/ABS/PATH/scratch-plugin/src/my-plugin.ts'
 ```
 
-插件路径必须是绝对路径。patch 只贡献配置，不改变 loader 解析模块时用的 profile 目录。
+patch 只贡献配置，不改变 loader 解析模块时用的 profile 目录。
 
 ```sh
-cd /Users/leon/Downloads/leonlearn/learn_dsh/deepseek-harness
 pnpm dsh web --patch ./scratch-plugin/cordis.yml
 ```
 
 终端应出现 `[greet-tool] plugin loaded`。有 API key 时在 UI 里说：`Use the greet tool to greet Ada.` 没 key 至少确认插件加载成功。
 
-想让问候语可配置，按 [`config.zh.md`](../../deepseek-harness/docs/user/develop/basic/config.zh.md) 给这个插件加 `Config`。这是把第 5 章搬到产品路径上。
+想让问候语可配置，按 [`config.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/develop/basic/config.zh.md) 给这个插件加 `Config`。这是把第 5 章搬到产品路径上。
 
 `scratch-plugin/` 是练习场，不要提交。
 
@@ -221,15 +240,14 @@ pnpm dsh web --patch ./scratch-plugin/cordis.yml
 
 ## 六、作业
 
-写 [`learn/02-cordis.md`](../02-cordis.md)。用自己的话写 5 个核心概念 + 四种分发模式表，不要抄 primer。另加一小节：从教程启动器到 `dsh web --patch` 你看到的差别。
+写 [02-cordis.md](../02-cordis.md)。用自己的话写 5 个核心概念 + 四种分发模式表，不要抄 primer。另加一小节：从教程启动器到 `dsh web --patch` 你看到的差别。
 
 ## 七、明日预告
 
-合上键盘读架构。turn / step / Round、三类事件、工具流水线、capability seam。第 3 天几乎不写代码，但过不了就不要进主干源码。
+先读 [architecture.md](./architecture.md)，再读官方 architecture。过不了第 3 天不要进主干源码。
 
----
-
-### 参考答案
+<details>
+<summary>参考答案</summary>
 
 1. Cordis 要的是 Standard Schema 验证器。普通对象没有校验协议，加载时不会按字段检查，也补不了默认值。
 2. 每次读取都生成新 id，整条被当成删除再添加，即使文本没变也会重新挂载。
@@ -237,3 +255,5 @@ pnpm dsh web --patch ./scratch-plugin/cordis.yml
 4. `dsh-tools` 注入 `systemPrompt`，用它把工具 schema 送进提示词组装。缺提供方则 tools 自己 PENDING，greet-tool 跟着等。
 5. 产品启动时树已经由 profile 的 bundle 填满。`--patch` 是叠在上面的补丁列表，用 `insert` 加新条目，或按 `id` 整份替换已有条目的 config。
 6. 不是。`tools/result` 是工具注册表发出的实时观察事件；`tool/result` 是 agent-loop 随后写入会话日志的持久事实。名字故意接近，域不同。
+
+</details>

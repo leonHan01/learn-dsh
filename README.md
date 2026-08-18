@@ -4,6 +4,8 @@ English | [中文](README.zh.md)
 
 A study workspace for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`): a 12-day course from the plugin runtime to the agent loop, meant to sit next to an upstream checkout.
 
+**Lectures are in Chinese.** Start at [course/README.md](course/README.md). Architecture diagrams: [course/architecture.md](course/architecture.md). Verified against deepseek-harness [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b) (2026-08-13).
+
 This is not a fork and not an official DeepSeek project. Clone [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) beside this repo. This repository is the curriculum and your notes.
 
 A typical local layout:
@@ -63,8 +65,9 @@ Domain words follow the official [glossary](https://github.com/deepseek-ai/deeps
   00-学习路径.md            Full map: phases, gates, what to skip
   course/
     README.md               Course table of contents
-    day-01.md … day-12.md   Lectures (goals, explanation, lab, quiz, answers)
-  01-….md                   Your write-ups (you create these)
+    architecture.md         Diagrams (plugin tree, turn, seams)
+    day-01.md … day-12.md   Lectures
+  01-跑起来.md …            Homework stubs (fill these in)
 ```
 
 Inside the sibling checkout, the parts the course actually uses:
@@ -119,7 +122,7 @@ pnpm dsh --profile web --dump-config  # the plugin tree that actually booted
 pnpm dsh --profile headless "Introduce yourself in one sentence."
 ```
 
-Then open **[Day 1](course/day-01.md)**. Do not start in `packages/`.
+Then open **[Day 1](course/day-01.md)**. Skim **[architecture.md](course/architecture.md)** whenever a lecture points at a figure. Do not start in `packages/`.
 
 The first hour is meant to answer three questions only: it runs, it is a plugin tree, the tree is visible from config.
 
@@ -177,7 +180,8 @@ Lectures: [`course/`](course/README.md). Phase map: [`00-学习路径.md`](00-�
 | 3 | [Architecture map](course/day-03.md) | You can draw the turn flow and name the three event domains |
 | 4 | [scope + session](course/day-04.md) | You can mark surface events in a real `session.jsonl` |
 | 5 | [system-prompt + tools](course/day-05.md) | You can follow `register` into `request/header` |
-| 6 | [llm + agent + agent-loop](course/day-06.md) | You can walk one step in `agent.ts` |
+| 6 | [llm + agent interface](course/day-06.md) | You can explain why UI talks to `ctx.agents` |
+| 6b | [agent-loop](course/day-06-loop.md) | You can walk one step in `agent.ts` |
 | 7 | [Boot and composition](course/day-07.md) | You can diff the `web` and `headless` trees |
 | 8 | [Shell seam + write a tool](course/day-08.md) | You can add a tool and a deny hook without touching the loop |
 | 9 | [Session data plane](course/day-09.md) | You can tell persistence, surface, and compaction apart |
@@ -216,21 +220,21 @@ Current design notes live in `.agents/notes/implemented/`. After day 3, follow l
 
 ## Official dsh docs
 
-Paths below are relative to the sibling `deepseek-harness/` checkout. On GitHub they live in [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness).
+Pinned to [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b). Locally the same files live under `../deepseek-harness/`.
 
 | Doc | Role |
 |---|---|
-| [Architecture](../deepseek-harness/docs/architecture.md) | Cross-subsystem behavior (required) |
-| [Glossary](../deepseek-harness/docs/glossary.md) | Domain language (required) |
-| [Cordis primer](../deepseek-harness/docs/cordis-primer.md) | One-page plugin model |
-| [Cordis tutorial](../deepseek-harness/docs/cordis-tutorial/index.md) | Hands-on, no API key |
-| [Agent lifecycle](../deepseek-harness/docs/agent-lifecycle.md) | Turn / step sequence diagram |
-| [Tool execution pipeline](../deepseek-harness/docs/tool-execution-pipeline.md) | Where policy runs outside the loop |
-| [Subsystem pages](../deepseek-harness/docs/subsystems/README.md) | Per-service vocabulary (reference) |
-| [Graph atlas](../deepseek-harness/docs/graph-atlas.md) | Index of generated and curated diagrams |
-| [Cookbook](../deepseek-harness/docs/cookbook/extension-cookbook.md) | How to extend |
-| [Testing](../deepseek-harness/docs/testing.md) | What each test command is allowed to prove |
-| Upstream [README](../deepseek-harness/README.md) | How to run dsh as a product |
+| [Architecture](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/architecture.md) | Cross-subsystem behavior (required) |
+| [Glossary](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/glossary.md) | Domain language (required) |
+| [Cordis primer](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-primer.md) | One-page plugin model |
+| [Cordis tutorial](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cordis-tutorial/index.md) | Hands-on, no API key |
+| [Agent lifecycle](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/agent-lifecycle.md) | Turn / step sequence diagram |
+| [Tool execution pipeline](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/tool-execution-pipeline.md) | Where policy runs outside the loop |
+| [Subsystem pages](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/subsystems/README.md) | Per-service vocabulary (reference) |
+| [Graph atlas](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/graph-atlas.md) | Index of generated and curated diagrams |
+| [Cookbook](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/extension-cookbook.md) | How to extend |
+| [Testing](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/testing.md) | What each test command is allowed to prove |
+| Upstream [README](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/README.md) | How to run dsh as a product |
 
 Chinese counterparts use the same path with `.zh.md`.
 
