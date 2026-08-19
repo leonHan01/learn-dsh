@@ -53,6 +53,8 @@ node --import tsx ../../vendor/cordis/bin.js
 
 只有三种进 `deriveMessages()`：`user/message`、`assistant/message`、`tool/result`。
 
+`assistant/chunk`、`reasoning-chunks`、`text-chunks`、`tool-call-chunks` 是流式/压缩块，打开 jsonl 时标出来即可，不是 surface。
+
 ## 工具流水线
 
 `pre-execute`（allow / deny / ask）→ `guard` → `execute` 环绕 → 主体 → `post-execute` → `finalizeContent` → `tools/result` → 循环写 `tool/result`。
@@ -73,6 +75,10 @@ node --import tsx ../../vendor/cordis/bin.js
 ## 循环三层
 
 步骤 = 一次模型请求 + 其工具。轮次 = 排空一次已接纳输入。Round = 策略层（Goal / Ralph）。
+
+## 和其他 harness
+
+一页对照：[compare.md](./compare.md)。`dsh-llm-pi-ai` 是模型适配器，不是 Pi coding agent。
 
 ## 对照日志
 

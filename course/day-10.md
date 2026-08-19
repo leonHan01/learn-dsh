@@ -43,6 +43,28 @@ flowchart TB
 | **workflow** | worker-thread 里跑的编排脚本 | 不是 Ralph | 脚本调 `agent()` 再开子 agent | `workflow` |
 | **jobs** | 通用后台任务运行时 | 不是 agent | 无独立会话 | `job_list` / `job_output` / `job_kill` |
 
+同一句「把测试修绿」四条路，图见 [architecture.md §27](./architecture.md#27-同一句把测试修绿四条路)。
+
+```mermaid
+sequenceDiagram
+  participant U as 用户
+  participant P as 父会话
+  participant C as 子会话
+  U->>P: 分头去修测试
+  P->>C: subagent 新会话
+  Note over C: 看不见父的 scope 工具
+  C-->>P: 结果 / settle 通知
+```
+
+```mermaid
+sequenceDiagram
+  participant U as 用户
+  participant S as 同一会话
+  U->>S: /goal 盯着修绿
+  S->>S: Goal Round = 一次续行轮次
+  Note over S: 你随口问一句不耗 Round
+```
+
 决策经验：
 
 - 要分头干活、不想污染当前窗口 → subagent

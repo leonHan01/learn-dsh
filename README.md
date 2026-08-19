@@ -4,7 +4,7 @@ English | [中文](README.zh.md)
 
 A 12-day course on [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`): from the plugin runtime to the agent loop. Not a fork, not official. Sit this repo next to an upstream checkout.
 
-**Lectures are Chinese.** The HTML site is the intended reader (Mermaid renders there).
+**Lectures are Chinese.** The HTML site is the intended reader (Mermaid renders there). Marked and Mermaid load from jsDelivr; offline, read the `.md` files directly.
 
 ## Browse
 
@@ -16,11 +16,14 @@ Open **http://127.0.0.1:8765/site/**
 
 | Page | What |
 |---|---|
+| [Day 1](course/day-01.md) | Start here |
 | [Course table](course/README.md) | Days and gates |
-| [Architecture atlas](course/architecture.md) | 23 diagrams |
+| [Architecture atlas](course/architecture.md) | 28 sections |
 | [One-request walkthrough](course/walkthrough.md) | One `followup` through the stack |
 | [Cheatsheet](course/cheatsheet.md) | `ctx` keys, events, commands |
 | [Common mistakes](course/mistakes.md) | What the course keeps repeating |
+| [vs Pi / Codex / Claude Code](course/compare.md) | How dsh differs from other harnesses |
+| [Example booklet](course/examples.md) | Copy-paste plugins, patches, tools |
 | [Learning path](00-学习路径.md) | Phase ↔ day, what not to open |
 
 Verified against deepseek-harness [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b) (2026-08-13).
@@ -47,6 +50,9 @@ learn_dsh/                    folder on disk, not this git root
     walkthrough.md
     cheatsheet.md
     mistakes.md
+    compare.md
+    examples.md
+    homework-sample.md
     day-01.md … day-12.md · day-06-loop.md
   01-跑起来.md … 12-工程与表面.md
 ```
@@ -114,6 +120,8 @@ Skip as an entry: `packages/client`, generated catalogs, `vendor/cordis` source,
 ## Official docs
 
 Pinned to [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b). Same paths under `../deepseek-harness/`.
+
+To retarget a newer upstream SHA: replace `47f943859b` in this repo, open one snapshot URL (e.g. `examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl`) and confirm it still exists, then skim upstream `docs/glossary.md` and `docs/architecture.md` for renamed terms.
 
 | Doc | Role |
 |---|---|

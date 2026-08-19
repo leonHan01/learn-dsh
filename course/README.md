@@ -1,12 +1,14 @@
 # dsh 课程
 
-**课表真源。** 阶段全图见 [00-学习路径.md](../00-学习路径.md)。图集 [architecture.md](./architecture.md) · 跟读 [walkthrough.md](./walkthrough.md) · 速查 [cheatsheet.md](./cheatsheet.md) · 易错 [mistakes.md](./mistakes.md)。
+**课表真源。** 阶段全图见 [00-学习路径.md](../00-学习路径.md)。图集 [architecture.md](./architecture.md) · 跟读 [walkthrough.md](./walkthrough.md) · 速查 [cheatsheet.md](./cheatsheet.md) · 易错 [mistakes.md](./mistakes.md) · 和其他 harness 比 [compare.md](./compare.md) · 例子 [examples.md](./examples.md)。
 
 用浏览器读：仓库根执行 `./site/serve.sh`，打开 http://127.0.0.1:8765/site/
 
 对照上游：[`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b)（2026-08-13）。本机检出：仓库根的 `../deepseek-harness/`。讲义里的上游链接一律指向该 commit 的 GitHub 页面，在网页上可点；本机对照同一相对路径即可。
 
-讲义是中文。每天约 4–6 小时：先读讲解 → 做实验 → 先做测验再展开文末答案 → 在**仓库根**写作业（文件名见各天文末，已有空模板）。官方文档是对照读物，不是讲义本身。
+换更新 SHA：全仓库替换 `47f943859b` → 打开一条 snapshot 链接确认还在 → 扫 glossary / architecture 有没有改名。
+
+讲义是中文。每天约 4–6 小时：先读讲解 → 做实验 → 先做测验再展开文末答案 → 在**仓库根**写作业（文件名见各天文末，已有空模板）。厚度对照 [homework-sample.md](./homework-sample.md)，不要抄。官方文档是对照读物，不是讲义本身。
 
 | 天 | 文件 | 主题 | 过关 |
 |---|---|---|---|

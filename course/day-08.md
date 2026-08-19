@@ -4,7 +4,7 @@
 **时长：** 6 小时
 **今天结束时你能：** 画出 shell 三角；解释 request / spec 为什么拆开；写出一个带 schema、renderer、卡片意图的工具，并用 hook 拒绝一次调用。
 
-这是核心课最后一天。工具按官方形状写，不要发明 API。三角图：[architecture.md §8](./architecture.md)。
+这是核心课最后一天。工具按官方形状写，不要发明 API。三角图：[architecture.md §8](./architecture.md#8-capability-seam)。
 
 ## 时间表
 
@@ -90,7 +90,7 @@ ShellExecSpec        执行器看到的完整、已解析描述
 
 ## 三、动手：写一个正经工具
 
-严格按：
+可抄的最小形状见 [examples.md §2–5](./examples.md)。严格按：
 
 1. [`user/develop/basic/tool.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/user/develop/basic/tool.zh.md)（你第 2 天做过最小版）
 2. [`cookbook/adding-a-tool.zh.md`](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/cookbook/adding-a-tool.zh.md)
@@ -105,7 +105,7 @@ ShellExecSpec        执行器看到的完整、已解析描述
 3. `output.schema` 是对象（例如 `{ lines, words, chars }`），不是散文 string
 4. `output.render` 把对象变成一两行文本
 5. `presentCall` 返回 `{ card: 'generic', title, kind: 'search' }` 之类
-6. `presentResult` 用结果对象生成标题（纯函数，不读文件第二次）
+6. `presentResult(args, result)` 用 `result.meta` / `result.isError` 生成标题（纯函数）。`result` 不是 `execute` 的返回值；数字经 `output.presentationMeta` 进 `meta`
 7. `execute` 使用 `exec.signal`
 8. 另写一个 `deny-plugin.ts`，对某个参数值 `pre-execute` 返回 deny
 9. `--patch` 同时 insert 两个插件，Web 或教程启动器能跑

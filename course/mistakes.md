@@ -40,6 +40,10 @@ scope 不沿 lineage 继承。`parentSession` / `delegationDepth` 只是数据�
 
 setup 时 agent 还没发布。只注册。驱动是 `session-start` 之后的事。
 
+## 把 `reasoning-chunks` 当成 surface
+
+jsonl 里的 `assistant/chunk`、`reasoning-chunks`、`text-chunks`、`tool-call-chunks` 是流式或压缩块。模型历史只有 `user/message`、`assistant/message`、`tool/result`。
+
 ## 第一份日志就打开 advanced-toolchain
 
 那条 `request/header` 是整份 Code Mode SDK。先 [text-turn](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl)，再 [bash-tool](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/bash-tool/session.jsonl)。
@@ -59,3 +63,7 @@ shell 的非零退出、超时杀死是 **resolve 出来的值**。reject 只留
 ## 从 `packages/client` 学循环
 
 client 只是适配器：外部输入 → `followup`；`session/event` → 卡片。循环在 `agent-loop`。
+
+## 把 dsh 当成「另一个 Pi」或「开源 Codex」
+
+Pi 是最小核心；Codex 是一份 Rust core 多表面。dsh 是 **Cordis 插件树 + 可替换 loop + 日志不变量**。对照 [compare.md](./compare.md)，不要用 `dsh-llm-pi-ai` 去理解 Pi harness。

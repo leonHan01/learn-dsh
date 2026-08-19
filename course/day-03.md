@@ -10,7 +10,7 @@
 
 | 时段 | 内容 |
 |---|---|
-| 0:00–1:00 | 精读 [architecture.md](./architecture.md) 全页 |
+| 0:00–1:00 | 精读 [architecture.md](./architecture.md) **§1–9** |
 | 1:00–2:00 | [architecture.zh.md](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/docs/architecture.zh.md) 对照图 |
 | 2:00–2:40 | 生命周期 + 工具流水线官方图 |
 | 2:40–3:20 | 必记术语（不要通读 glossary） |
@@ -20,7 +20,7 @@
 
 ## 一、先读图
 
-按这个顺序过 [architecture.md](./architecture.md)：
+按这个顺序过 [architecture.md](./architecture.md) **§1–9**（§10 以后按课表回头，今天不要通读）：
 
 1. 插件树怎么叠（§2）
 2. 五个 `ctx` + `agent-loop`（§3）
@@ -83,7 +83,9 @@ preset 的 scope 父链是后话（第 7 / 10 天）。今天先当扁平两层�
 2. 自己重画工具流水线（5 个阶段就够）。
 3. 改写「想加 X 挂哪」至少 8 行，用自己的动词。
 
-不会画就不要进第 4 天。能画之后读一遍 [walkthrough.md](./walkthrough.md)，把图上的框对到一次真实 `followup`。
+厚度对照 [homework-sample.md](./homework-sample.md)，不要抄它的句子。
+
+不会画就不要进第 4 天。能画之后读一遍 [walkthrough.md](./walkthrough.md)，把图上的框对到一次真实 `followup`。想拿 Pi / Codex 对照，读 [compare.md](./compare.md)。
 
 ## 五、明日预告
 

@@ -5,7 +5,7 @@
 **前置：** 先完成 [第 6 天 · 接口](./day-06.md)。  
 **今天结束时你能：** 对着 `agent.ts` / `tool-calls.ts` 走完一步 step；给一份 jsonl 写伪代码。
 
-图：[architecture.md §4](./architecture.md#4-一轮对话-turn--step--round) · [§18](./architecture.md#18-chunk-如何变成一条-assistant-消息)。
+图：[architecture.md §4](./architecture.md#4-一轮对话turn--step--round) · [§18](./architecture.md#18-chunk-如何变成一条-assistant-消息)。
 
 ```mermaid
 flowchart TB

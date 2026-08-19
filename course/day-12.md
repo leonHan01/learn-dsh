@@ -4,7 +4,7 @@
 **时长：** 4–5 小时
 **今天结束时你能：** 按要做的事选对表面入口；在改代码前知道会撞上哪些门禁。
 
-不要把 `packages/client` 当阅读材料从头翻。图：[architecture.md §23](./architecture.md#23-产品表面都是适配器)。跟读完整请求：[walkthrough.md](./walkthrough.md)。易错：[mistakes.md](./mistakes.md)。
+不要把 `packages/client` 当阅读材料从头翻。图：[architecture.md §23](./architecture.md#23-产品表面都是适配器)。跟读：[walkthrough.md](./walkthrough.md)。和其他 harness 比：[compare.md](./compare.md)。易错：[mistakes.md](./mistakes.md)。
 
 ## 时间表
 
@@ -151,7 +151,7 @@ ACP 是「协议驱动」范例：stdio 拥有 stdout，工厂创建/恢复 agen
 
 常用复习入口：
 
-- 忘了 turn 流程 → [architecture.md §4](./architecture.md#4-一轮对话-turn--step--round)
+- 忘了 turn 流程 → [architecture.md §4](./architecture.md#4-一轮对话turn--step--round)
 - 忘了事件域名 → [§5](./architecture.md#5-三类事件)
 - 要挂东西 → [§9](./architecture.md#9-想加-x-挂哪)
 - 表面怎么接 → [§23](./architecture.md#23-产品表面都是适配器)

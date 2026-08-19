@@ -4,7 +4,7 @@
 
 一门关于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（`dsh`）的 12 天课：从插件运行时讲到 agent loop。不是 fork，也不是官方项目。把本仓库放在上游检出旁边。
 
-**讲义是中文。** 用 HTML 站点读（Mermaid 会画出来）。
+**讲义是中文。** 用 HTML 站点读（Mermaid 会画出来）。Marked / Mermaid 从 jsDelivr 加载；没外网时直接读 `.md`。
 
 ## 浏览
 
@@ -16,11 +16,14 @@
 
 | 页 | 内容 |
 |---|---|
+| [第 1 天](course/day-01.md) | 从这里开课 |
 | [课表](course/README.md) | 每天过关标准 |
-| [架构图](course/architecture.md) | 23 张图 |
+| [架构图](course/architecture.md) | 28 节 |
 | [一次请求跟读](course/walkthrough.md) | 一条 `followup` 怎么穿过整栈 |
 | [速查](course/cheatsheet.md) | `ctx` 键、事件、命令 |
 | [易错](course/mistakes.md) | 课里反复强调的坑 |
+| [和其他 harness 比](course/compare.md) | dsh vs Pi / Codex / Claude Code |
+| [例子册](course/examples.md) | 可抄的插件、patch、工具 |
 | [学习路径](00-学习路径.md) | 阶段 ↔ 天、先不要打开什么 |
 
 对照上游 [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b)（2026-08-13）。
@@ -47,6 +50,9 @@ learn_dsh/                    磁盘文件夹，不是本仓库根
     walkthrough.md
     cheatsheet.md
     mistakes.md
+    compare.md
+    examples.md
+    homework-sample.md
     day-01.md … day-12.md · day-06-loop.md
   01-跑起来.md … 12-工程与表面.md
 ```
@@ -114,6 +120,8 @@ pnpm dsh --profile web --dump-config  # 实际启动的树
 ## 官方文档
 
 钉在 [`47f943859b`](https://github.com/deepseek-ai/deepseek-harness/commit/47f943859b)。本机在 `../deepseek-harness/`。
+
+要换更新的上游 SHA：在本仓库替换 `47f943859b`，打开一条 snapshot 链接（例如 `examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl`）确认还在，再扫一眼上游 `docs/glossary.zh.md` 和 `docs/architecture.zh.md` 有没有改名。
 
 | 文档 | 角色 |
 |---|---|

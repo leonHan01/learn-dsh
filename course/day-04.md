@@ -182,12 +182,14 @@ user/message             surfaceOp=append     ← 模型历史第 1 条
 session/title
 request/header           系统提示词 + tools    ← 不进 deriveMessages
 assistant/chunk *        流式文本
+reasoning-chunks /
+text-chunks              压缩过的流式块，不是 surface
 assistant/message        surfaceOp=append     ← 模型历史第 2 条
 step/end
 turn/end
 ```
 
-`deriveMessages()` 得到 2 条：user、assistant。chunk 不算。这份 snapshot 没有 `tool/call`。带工具的链明天用 `bash-tool`。
+`deriveMessages()` 得到 2 条：user、assistant。`assistant/chunk` 和 `*-chunks` 都不算。这份 snapshot 没有 `tool/call`。带工具的链明天用 `bash-tool`。
 
 ---
 

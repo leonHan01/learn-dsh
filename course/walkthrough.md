@@ -2,7 +2,7 @@
 
 把第 3–6 天串成一条线。假设 Web 里用户发送：`List files in the workspace.` 模型决定调用 `bash`。
 
-对照 [architecture.md §4](./architecture.md#4-一轮对话-turn--step--round) · [§7](./architecture.md#7-工具流水线在-loop-外面) · [§16](./architecture.md#16-一次-assemble)。
+对照 [architecture.md §4](./architecture.md#4-一轮对话turn--step--round) · [§7](./architecture.md#7-工具流水线在-loop-外面) · [§16](./architecture.md#16-一次-assemble)。
 
 ---
 
@@ -91,6 +91,45 @@ pre-execute  →  guard  →  execute 环绕  →  tool-bash.execute
 `step/end`。工具结果还欠一次模型请求 → 再 `claim` next-step（通常空）→ `pre-step` → step 2。第二次模型只回文本，没有 tool-call → `agent/turn-stopping` → `turn/end` → `idle`。
 
 UI 全程听 `session/event` 画卡片，听 `agent/status` 显示 running / idle。
+
+---
+
+## 6b. 这一轮日志看起来像什么
+
+类型序列（和 [bash-tool](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/bash-tool/session.jsonl) 同类）：
+
+```text
+session
+agent/inbox/spliced          ← followup 插入
+turn/start
+agent/inbox/spliced          ← claim 删除
+step/start
+user/message                 ← surface
+session/title
+request/header               ← 提示词 + tools，非 surface
+request/context
+assistant/chunk *            ← 流式 tool-call
+reasoning-chunks / text-chunks / tool-call-chunks
+                             ← 压缩过的流式块，不是 surface
+assistant/message            ← surface，里面是 bash
+tool/call                    bash
+tool/result                  ← surface
+step/end
+step/start                   ← 工具还欠一次模型请求
+assistant/chunk *
+assistant/message            ← 纯文本最终回答
+step/end
+turn/end
+```
+
+```mermaid
+flowchart LR
+  u["user/message"] --> a1["assistant: tool-call"]
+  a1 --> tr["tool/result"]
+  tr --> a2["assistant: 文本"]
+```
+
+`deriveMessages()` 只要带 surface 的那几条。chunk、`*-chunks`、header、inbox splice 都不进模型窗口。打开真实 jsonl 时先把 `reasoning-chunks` / `text-chunks` / `tool-call-chunks` 标成「压缩流式块」，不要当成漏讲的 surface。
 
 ---
 

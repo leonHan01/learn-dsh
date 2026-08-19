@@ -9,17 +9,20 @@
 |---|---|
 | 1 | [§11 Fiber](#11-cordis-fiber) · [§12 分发](#12-四种分发) |
 | 2 | [§2 插件树](#2-运行中的-dsh-是一棵插件树) · [§11](#11-cordis-fiber) · [§13 patch](#13-产品-patch-怎么插进去) |
-| 3 | 本页全读一遍 |
+| 3 | **§1–9**（今天只读到「想加 X」；后面按天回头） |
 | 4 | [§6 日志](#6-日志是真源surface-才进模型) · [§14 scope](#14-scope-不是谱系) · [§15 inbox](#15-两个-inbox) |
 | 5 | [§16 提示词组装](#16-一次-assemble) · [§7 工具流水线](#7-工具流水线在-loop-外面) |
 | 6 | [§3 脊柱](#3-核心脊柱) · [§17 创建 agent](#17-创建与恢复-agent) · [§18 流式块](#18-chunk-如何变成一条-assistant-消息) |
-| 6 续 | [§4 一轮对话](#4-一轮对话-turn--step--round) · [§15 inbox](#15-两个-inbox) |
+| 6 续 | [§4 一轮对话](#4-一轮对话turn--step--round) · [§15 inbox](#15-两个-inbox) |
 | 7 | [§2](#2-运行中的-dsh-是一棵插件树) · [§19 从命令到第一轮](#19-从-dsh-web-到第一轮) |
 | 8 | [§8 seam](#8-capability-seam) · [§20 执行世界](#20-执行世界一起搬走) |
 | 9 | [§6](#6-日志是真源surface-才进模型) · [§21 压缩](#21-compaction-改窗口) |
 | 10 | [§10](#10-四条继续干活不要混) · [§14](#14-scope-不是谱系) |
 | 11 | [§22 两条通道](#22-人类通道与模型通道) |
 | 12 | [§23 产品表面](#23-产品表面都是适配器) |
+| 对照 | [compare.md](./compare.md) · [examples.md](./examples.md) |
+| 日志条 | [§24](#24-一份短日志长什么样) · [§25 并行保序](#25-并行工具如何保序) |
+| 其它 | [§26 HMR](#26-hmr-在干什么) · [§27 四条路](#27-同一句把测试修绿四条路) · [§28 harness 形状](#28-和其他-harness-的形状) |
 
 ---
 
@@ -546,3 +549,88 @@ flowchart TB
 ```
 
 所有表面都做两件事：外部输入变成 `followup` / `steer` / `cancel`；从 `session/event` 和 `agent/*` 渲染出去。不要从 `packages/client` 学循环。
+
+---
+
+## 24. 一份短日志长什么样
+
+[text-turn](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/text-turn/session.jsonl) 的骨架（类型，不是全文）：
+
+```mermaid
+flowchart TD
+  h["session header"] --> s0["inbox/spliced 插入用户句"]
+  s0 --> t1["turn/start"]
+  t1 --> s1["inbox/spliced 领取删除"]
+  s1 --> st["step/start"]
+  st --> um["user/message surface"]
+  um --> rh["request/header 不进 surface"]
+  rh --> ck["assistant/chunk *"]
+  ck --> am["assistant/message surface"]
+  am --> se["step/end"]
+  se --> te["turn/end"]
+```
+
+带工具时在 `assistant/message` 和 `step/end` 之间插入 `tool/call` → `tool/result`。见 [bash-tool](https://github.com/deepseek-ai/deepseek-harness/blob/47f943859b/examples/jsonrpc-agent/tests/snapshots/bash-tool/session.jsonl) 和 [walkthrough](./walkthrough.md)。
+
+真实 jsonl 里 `assistant/chunk` 旁边还有 `reasoning-chunks` / `text-chunks` / `tool-call-chunks`：那是压缩过的流式块，标出来即可，**不是** surface。
+
+---
+
+## 25. 并行工具如何保序
+
+```mermaid
+sequenceDiagram
+  participant M as 模型顺序: A then B
+  participant Pool as 滚动池
+  participant Log as session
+  M->>Pool: start A, start B
+  Pool-->>Log: tool/call A
+  Pool-->>Log: tool/call B
+  Note over Pool: B 先跑完也先不写 result
+  Pool-->>Log: tool/result A
+  Pool-->>Log: tool/result B
+```
+
+`isConcurrencySafe === true` 才进池。写回顺序跟模型给出的 call 顺序，不是完成顺序。
+
+---
+
+## 26. HMR 在干什么
+
+```mermaid
+flowchart LR
+  save["保存插件.ts"] --> un["unload: 跑全部 disposer"]
+  un --> load["load: 再 apply"]
+  load --> same["依赖 inject 的插件跟着卸/挂"]
+```
+
+所以 `setInterval` 必须在 `ctx.effect` 里。HMR 不是「热补丁函数」，是整棵 fiber 拆掉再挂。
+
+---
+
+## 27. 同一句「把测试修绿」四条路
+
+```mermaid
+flowchart TB
+  job["用户: 把测试修绿"]
+  job --> g["goal: 同会话盯着修<br/>人类轮次不耗 Goal Round"]
+  job --> s["subagent: 新会话去做<br/>父窗口不被中间步骤撑爆"]
+  job --> r["Ralph: 每 Round 全新 agent<br/>工作区当记忆"]
+  job --> w["workflow: 脚本扇出<br/>测很多包 / 很多角度"]
+```
+
+选错的典型症状：用 Ralph 当普通续聊；用 goal 当「另开一个干净上下文」；用 workflow 只委派一次。
+
+---
+
+## 28. 和其他 harness 的形状
+
+```mermaid
+flowchart TB
+  task["拦一次 bash"]
+  task --> pi["Pi: 扩展里的钩子"]
+  task --> cx["Codex: hooks 文件"]
+  task --> dsh["dsh: tools/pre-execute 插件"]
+```
+
+完整对照：[compare.md](./compare.md)。

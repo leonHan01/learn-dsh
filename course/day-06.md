@@ -94,6 +94,17 @@ loop 通过 `ctx.llm` 说话，从不 import `llm-deepseek`。换提供方 = 换
 
 `CreateAgentOptions.setup(agentCtx)`：**setup 里调用 followup 是协议错误。**
 
+### 三个反例
+
+**UI 里 `import { ReactLoopAgent }`。**  
+包根不导出驱动器。就算从 `src/` 偷，也把产品和某一个 loop 焊死了。正确：`ctx.agents.get(id).followup(...)`。
+
+**`setup` 里 `agent.followup(welcome)`。**  
+setup 时 agent 还没进注册表，驱动没挂上。欢迎语放在 `agent/session-start` 之后，由已经发布的句柄发出。
+
+**create 中途失败还继续用半成品。**  
+工厂是事务：session / agent / scope 任一失败就回滚，注册表里不会留下半个 agent。不要自己 `new` 完再手动补 session。
+
 ### 发起方作用域
 
 `withInitiator(agent, fn)` 用 AsyncLocalStorage 记住「谁发起的」。进程内事实；出了进程边界必须以显式字段传递。明天读 loop 碰到 `currentInitiator` 不会慌。
@@ -106,6 +117,8 @@ loop 通过 `ctx.llm` 说话，从不 import `llm-deepseek`。换提供方 = 换
 2. `deriveMessages()` 的返回值还要不要再翻译成适配器格式？谁负责翻译？
 3. setup 里调用 `followup` 为什么不行？
 4. `inject` 之后 agent 仍是 idle。下一次模型什么时候能看见这段上下文？
+5. create 失败后，`ctx.agents.get` 还能拿到半成品吗？
+6. 为什么 Web / ACP 不能从 `packages/core/agent-loop/src/agent.ts` 直接 new？
 
 ## 四、作业
 
@@ -122,5 +135,7 @@ loop 通过 `ctx.llm` 说话，从不 import `llm-deepseek`。换提供方 = 换
 2. 不用再译一层消息。适配器消耗的就是这些 `Message`。
 3. setup 时 agent 尚未发布。驱动未启动的 agent 是协议错误。
 4. 下一次被 `followup` / `steer` 唤醒并领取 next-step 时，inject 的消息进入 `pre-step`。
+5. 不能。事务回滚，注册表里不会留下半个 agent。
+6. 包不导出内部实现；依赖具体类等于不能换 loop。面向 `ctx.agents`。
 
 </details>
