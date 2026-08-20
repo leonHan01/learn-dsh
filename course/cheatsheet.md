@@ -7,6 +7,7 @@
 ```sh
 # 读教程
 ./site/serve.sh                          # http://127.0.0.1:8765/site/
+# 站点里 [ / ] 按课表翻页；端口占用则 PORT=8766 ./site/serve.sh
 
 # 产品（在 ../deepseek-harness）
 pnpm dsh web

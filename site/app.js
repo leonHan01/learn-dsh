@@ -33,6 +33,7 @@ let viewingId = "home";
 let slugCounts = Object.create(null);
 let lastPageId = "";
 let catalog = null;
+let renderGen = 0;
 
 function pageById(id) {
   return PAGES.find((p) => p.id === id);
@@ -359,6 +360,7 @@ function renderContinue(currentId) {
 }
 
 async function render() {
+  const gen = ++renderGen;
   const { id, heading } = parseLocation();
   const status = document.getElementById("status");
   const prose = document.getElementById("prose");
@@ -367,19 +369,22 @@ async function render() {
   if (id.startsWith("hw/")) {
     const name = decodeURIComponent(id.slice(3));
     viewingId = id;
-    lastPageId = id;
     renderNav("");
     renderContinue("");
     status.textContent = name + ".md";
     try {
       slugCounts = Object.create(null);
       const md = await loadMarkdown(`${name}.md`);
+      if (gen !== renderGen) return;
       prose.innerHTML = marked.parse(md);
       enhanceCode(prose);
       applySearch("");
     } catch (err) {
+      if (gen !== renderGen) return;
       prose.innerHTML = `<p class="error">打不开作业 ${name}.md：${err.message}</p>`;
     }
+    if (gen !== renderGen) return;
+    lastPageId = id;
     if (pageChanged) collapseNavIfMobile();
     return;
   }
@@ -387,12 +392,12 @@ async function render() {
   const page = pageById(id);
   if (!page) {
     viewingId = "home";
-    lastPageId = id;
     renderNav("");
     renderContinue("");
     status.textContent = "未找到";
     document.title = "未找到 · learn_dsh";
     prose.innerHTML = `<p class="error">没有这一页：<code>${escapeHtml(id)}</code>。<a href="#/home">回首页</a> · <a href="#/day-01">第 1 天</a></p>`;
+    lastPageId = id;
     if (pageChanged) collapseNavIfMobile();
     return;
   }
@@ -407,6 +412,7 @@ async function render() {
   try {
     slugCounts = Object.create(null);
     const md = await loadMarkdown(page.file);
+    if (gen !== renderGen) return;
     if (catalog) {
       const row = catalog.find((r) => r.id === page.id);
       if (row) row.text = md.toLowerCase();
@@ -417,13 +423,16 @@ async function render() {
     if (window.mermaid) {
       await mermaid.run({ querySelector: "#prose .mermaid" });
     }
+    if (gen !== renderGen) return;
     applySearch(page.id);
     const el = findHeading(heading);
     if (el) el.scrollIntoView();
     else if (pageChanged) window.scrollTo(0, 0);
   } catch (err) {
+    if (gen !== renderGen) return;
     prose.innerHTML = `<p class="error">加载失败：${err.message}。请确认从仓库根启动了站点（learn/site/serve.sh）。</p>`;
   }
+  if (gen !== renderGen) return;
   lastPageId = id;
   if (pageChanged) collapseNavIfMobile();
 }

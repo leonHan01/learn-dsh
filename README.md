@@ -14,6 +14,8 @@ A 12-day course on [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-ha
 
 Open **http://127.0.0.1:8765/site/**
 
+On the site, `[` / `]` follow the course table. If port 8765 is taken, open that URL or run `PORT=8766 ./site/serve.sh`.
+
 | Page | What |
 |---|---|
 | [Day 1](course/day-01.md) | Start here |
@@ -133,4 +135,4 @@ To retarget a newer upstream SHA: replace `47f943859b` in this repo, open one sn
 
 ## License
 
-`deepseek-harness/` is MIT. This repo is study notes.
+This course is [CC BY 4.0](LICENSE). `deepseek-harness/` (sibling checkout, not in this repo) is MIT.

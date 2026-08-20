@@ -136,7 +136,7 @@ ctx.tools.register(defineTool({
 2. **只返回规范 JSON 值。** 不要返回内容块。人类可读解释放 `output.render`。
 3. **抛错或返回非法值 → `isError`。** 领域上的「命令退出码非 0」通常仍是成功值，由 renderer 解释。
 4. **遵守 `exec.signal`。** 取消是协作式的。
-5. **`presentCall` / `presentResult` 是纯函数。** 决定 UI 卡片（`generic` / `terminal` / `diff`）。不做 I/O，不读时钟。没有它们就回退通用卡片。第 8 天会设计一张。
+5. **`presentCall` / `presentResult` 是纯函数。** 决定 UI 卡片（`generic` / `terminal` / `diff`）。不做 I/O，不读时钟。没有它们就回退通用卡片。`presentResult` 的第二个参数是 `{ content, isError, meta? }`，不是 `execute` 的返回值；今天不要深挖，完整形状见 [examples.md](./examples.md) 第 4 节，第 8 天再写一张。
 
 `output.schema` 也是 Code Mode 的程序化 API：`await tools.read_file({ path })` 得到的是规范值，不是渲染文本。所以 schema 要像 API，不要像散文。
 

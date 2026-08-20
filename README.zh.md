@@ -14,6 +14,8 @@
 
 打开 **http://127.0.0.1:8765/site/**
 
+站点里 `[` / `]` 按课表翻页。若 8765 已被占用，直接打开该地址，或 `PORT=8766 ./site/serve.sh`。
+
 | 页 | 内容 |
 |---|---|
 | [第 1 天](course/day-01.md) | 从这里开课 |
@@ -133,4 +135,4 @@ pnpm dsh --profile web --dump-config  # 实际启动的树
 
 ## 许可证
 
-`deepseek-harness/` 是 MIT。本仓库是学习材料。
+本课是 [CC BY 4.0](LICENSE)。旁边的 `deepseek-harness/`（不在本仓库里）是 MIT。

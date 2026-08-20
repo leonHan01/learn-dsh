@@ -89,7 +89,7 @@ export function apply(ctx: Context) {
     description: 'Count words in a UTF-8 file.',
     parameters: {
       path: { type: 'string', required: true, description: 'Absolute path' },
-      limit: { type: 'number' },
+      limit: { type: 'number', description: 'Count at most this many words' },
     },
     output: {
       schema: {
@@ -109,14 +109,17 @@ export function apply(ctx: Context) {
     }),
     async execute(args, exec) {
       const text = await readFile(args.path, { encoding: 'utf8', signal: exec.signal })
-      const words = text.split(/\s+/).filter(Boolean).length
+      const parts = text.split(/\s+/).filter(Boolean)
+      const words = typeof args.limit === 'number' && args.limit >= 0
+        ? parts.slice(0, args.limit).length
+        : parts.length
       return { words, chars: text.length }
     },
   }))
 }
 ```
 
-`execute` 返回规范 JSON，不返回散文。卡片必须是纯函数。`presentResult` 的第二个参数是 `{ content, isError, meta? }`，**不是** `execute` 的返回值；给卡片用的数字走 `output.presentationMeta` → `result.meta`。`readFile` 来自 Node；不要在 `execute` 里写权限策略。
+`execute` 返回规范 JSON，不返回散文。卡片必须是纯函数。`presentResult` 的第二个参数是 `{ content, isError, meta? }`，**不是** `execute` 的返回值；给卡片用的数字走 `output.presentationMeta` → `result.meta`。可选的 `limit` 是「最多数这么多词」，不要留成死字段。`readFile` 来自 Node；不要在 `execute` 里写权限策略。
 
 ---
 
